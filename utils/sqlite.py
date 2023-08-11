@@ -134,16 +134,9 @@ def bhavcopy_index_range(start_date, end_date):
 def update_db_data(start_date, end_date):
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
-    st.write(pd.DataFrame(stockData['TCS']).to_records(index=False))
 
     conn = sqlite3.connect("./data/stock_database.sqlite")
     for stock in stockData:
-        df = pd.DataFrame(stockData[stock])
-
-        # query=f'''
-        #     INSERT INTO `{stock}` (`DATE`, `OPEN`, `HIGH`, `LOW`, `CLOSE`, `VOLUME`) VALUES (?,?,?,?,?,?)
-        # '''
-        # conn.executemany(query, df.to_records(index=False))
         query=f'''
             INSERT INTO `{stock}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
@@ -154,12 +147,6 @@ def update_db_data(start_date, end_date):
 
     conn = sqlite3.connect("./data/indice_database.sqlite")
     for indice in indiceData:
-        df = pd.DataFrame(indiceData[indice])
-
-        # query=f'''
-        #     INSERT INTO `{indice}` (`DATE`, `OPEN`, `HIGH`, `LOW`, `CLOSE`, `VOLUME`) VALUES (?,?,?,?,?,?)
-        # '''
-        # conn.executemany(query, df.to_records(index=False))
         query=f'''
             INSERT INTO `{indice}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
