@@ -1,0 +1,13 @@
+yfinance==0.2.22
+jugaad-data==0.22
+
+requests==2.31.0
+
+numpy==1.25.0
+pandas==2.0.3
+pandas_ta==0.3.14b
+ta-lib-bin==0.4.26
+
+plotly==5.15.0
+
+streamlit==1.25.0
