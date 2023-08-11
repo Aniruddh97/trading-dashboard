@@ -31,22 +31,24 @@ with st.sidebar:
 
 pbar = st.progress(0, text="Initializing NSE session")
 nse = NSE()
-pbar.progress(100, text="Fetching indices list")
-liveIndexData = nse.fetchIndices()
-pbar.progress(100, text="Fetch complete")
-ohlcData = liveStockData = None
+st.write(nse.session.get("https://www.nseindia.com/api/allIndices"))
+st.write(nse.session.get("https://www.nseindia.com/api/allIndices").text)
+# pbar.progress(100, text="Fetching indices list")
+# liveIndexData = nse.fetchIndices()
+# pbar.progress(100, text="Fetch complete")
+# ohlcData = liveStockData = None
 
-with st.form("Indice Selection"):
-    selected_ticker = st.selectbox('Select Index', liveIndexData['list'])
-    submitted = st.form_submit_button("Fetch Live Data")
-    if submitted:
-        pbar.progress(0, text=f"Fetching '{selected_ticker}' stocks")
-        liveStockData = nse.fetchIndexStocks(selected_ticker)
-        pbar.progress(100, text="NSE data load completed")
+# with st.form("Indice Selection"):
+#     selected_ticker = st.selectbox('Select Index', liveIndexData['list'])
+#     submitted = st.form_submit_button("Fetch Live Data")
+#     if submitted:
+#         pbar.progress(0, text=f"Fetching '{selected_ticker}' stocks")
+#         liveStockData = nse.fetchIndexStocks(selected_ticker)
+#         pbar.progress(100, text="NSE data load completed")
 
-        ohlcData = load_db_data(liveStockData['list'])
-        ohlcData = merge_with_live(ohlcData, liveStockData['data'])
-        st.write(ohlcData)
+#         ohlcData = load_db_data(liveStockData['list'])
+#         ohlcData = merge_with_live(ohlcData, liveStockData['data'])
+#         st.write(ohlcData)
 
 
 defaultQuery = "SELECT * FROM `TCS`"
