@@ -16,10 +16,7 @@ class NSE:
 		# self.session.headers.update({"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36"})
 		self.session.headers.update(
 			{
-				'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 
-				'Accept': 'text/html,application/json,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 
-				'Authority': 'www.nseindia.com',
-				'Referer': 'https://www.nseindia.com/market-data/live-market-indices',
+				'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36', 
 			}
 		)
 		self.session.get("https://www.nseindia.com/")
