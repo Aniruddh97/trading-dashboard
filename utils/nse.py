@@ -1,7 +1,9 @@
-import pandas as pd
 import requests
-from requests.adapters import HTTPAdapter
+import pandas as pd
+import streamlit as st
+
 from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 
 
 class NSE:
@@ -20,7 +22,7 @@ class NSE:
 				'Host': 'www.nseindia.com'
 			}
 		)
-		self.session.get("https://www.nseindia.com/")
+		st.write(self.session.get("https://www.nseindia.com/").text)
     
 
 	def fetchIndices(self):
