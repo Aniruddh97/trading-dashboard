@@ -22,7 +22,7 @@ class NSE:
 				'Host': 'www.nseindia.com'
 			}
 		)
-		st.write(self.session.get("https://www.nseindia.com/").text)
+		self.session.get("https://www1.nseindia.com/")
     
 
 	def fetchIndices(self):

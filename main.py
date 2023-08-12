@@ -30,14 +30,13 @@ with st.sidebar:
             update_db_data(start_date=start_date, end_date=end_date)
 
 
-# pbar = st.progress(0, text="Initializing NSE session")
-# nse = NSE()
-# st.write(nse.session.get("https://www.nseindia.com/api/allIndices"))
-# st.write(nse.session.get("https://www.nseindia.com/api/allIndices").text)
-try:
-    st.write(nsefetch("https://www.nseindia.com/api/allIndices"))
-except Exception as e:
-    st.write(str(e))
+pbar = st.progress(0, text="Initializing NSE session")
+nse = NSE()
+st.write(nse.session.get("https://www1.nseindia.com/api/allIndices").json())
+# try:
+#     st.write(nsefetch("https://www.nseindia.com/api/allIndices"))
+# except Exception as e:
+#     st.write(str(e))
 # pbar.progress(100, text="Fetching indices list")
 # liveIndexData = nse.fetchIndices()
 # pbar.progress(100, text="Fetch complete")
