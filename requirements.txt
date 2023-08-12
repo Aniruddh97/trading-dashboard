@@ -1,5 +1,6 @@
 yfinance==0.2.22
 jugaad-data==0.22
+nsepython==1.5
 
 requests==2.31.0
 
