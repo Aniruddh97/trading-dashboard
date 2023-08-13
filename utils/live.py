@@ -20,11 +20,16 @@ def get_live_data(ticker):
 
 
 def get_live_data_collection(tickers):
+    i=0
     live_collection = {}
+    pbar = st.progress(0, text=f"Fetching live data")
     for ticker in tickers:
+        i += 1
         try:
+            pbar.progress(int((i)*(100/len(tickers))), text=f"Loading live data : {ticker}")
             live_collection[ticker] = get_live_data(ticker)
         except:
              st.toast(f'Live data unavailable for {ticker}')
              continue
+    pbar.progress(100, text="Live load completed")
     return live_collection

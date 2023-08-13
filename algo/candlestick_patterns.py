@@ -4,7 +4,7 @@ from itertools import compress
 
 def getCandlePatternList(all=False):
     if not all:
-        return ['CDLINVERTEDHAMMER', 'CDLENGULFING', 'CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR', 'CDLHAMMER', 'CDLHANGINGMAN', 'CDLHARAMI', 'CDLMARUBOZU', 'CDLCLOSINGMARUBOZU', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR', 'CDLSHOOTINGSTAR']
+        return ['CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR']
     return talib.get_function_groups()['Pattern Recognition']
 
 
@@ -15,10 +15,10 @@ def recognizePattern(df, all=False):
     2nd - # of matched patterns
     """
 
-    op = df['Open'].astype(float)
-    lo = df['Low'].astype(float)
-    hi = df['High'].astype(float)
-    cl = df['Close'].astype(float)
+    op = df['OPEN'].astype(float)
+    lo = df['LOW'].astype(float)
+    hi = df['HIGH'].astype(float)
+    cl = df['CLOSE'].astype(float)
 
     candlePatterns = getCandlePatternList(all)
 

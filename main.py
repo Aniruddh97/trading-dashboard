@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from utils import *
+from algo import *
 
 with st.sidebar:
     with st.form("Recreate DB Form"):
@@ -100,29 +101,57 @@ with AnalysisTab:
             selected_indice = st.selectbox('Select Index', meta['LIST']['INDICES'])
             submitted = st.form_submit_button("Fetch Live Data")
             if submitted:
+                st.session_state['analysis'] = {}
                 if selected_indice in meta['LIST']:
                     tickers = meta['LIST'][selected_indice]
-                    pbar = st.progress(0, text=f"Fetching live data for '{selected_indice}' stocks")
                     
                     live_data = get_live_data_collection(tickers=tickers)
-                    pbar.progress(100, text="Live load completed")
 
                     ohlcData = load_db_data(tickers=tickers)
                     ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
                     
+                    i = 0
+                    analysis = {}
+                    analysis['data'] = {}
+                    analysis['rank'] = []
+                    pbar = st.progress(0, text=f"Analyzing data")
                     for ticker in ohlcLiveData:
-                        st.write(ticker)
-                        st.dataframe(ohlcLiveData[ticker])
-                        
-                    
+                        i += 1
+                        pbar.progress(int((i)*(100/len(tickers))), text=f"Analyzing {ticker}")
+
+                        df = ohlcLiveData[ticker]
+                        df = recognizePattern(df, all=False)
+                        sri = SupportResistanceIndicator(df, 11, 5, ticker)
+
+                        candleIndex = df.index.stop-1
+                        analysis['data'][ticker] = sri.getIndicator(candleIndex)
+                        analysis['rank'].append({
+                            'Ticker': ticker,
+                            'Pattern': df['candlestick_pattern'][candleIndex],
+                            'Pattern Rank': df['candlestick_rank'][candleIndex],
+                        })
+
+                    pbar.progress(100, text=f"Analysis complete")
+                    st.session_state['analysis'] = analysis
                 else:
                     st.toast(f'Company list for \'{selected_indice}\' not available')
         except Exception as e:
             st.toast(str(e))
 
+    if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
+        rank = pd.DataFrame(st.session_state['analysis']['rank'])
+        rank = rank.sort_values(by='Pattern Rank', ascending=True)
+        st.dataframe(rank)
+
+        indicator_obj = st.session_state['analysis']['data']
+        for ticker in rank.Ticker.to_list():
+            st.plotly_chart(indicator_obj[ticker])
 
 with StockTab:
-    with st.form("Stock Data"):
+    form = st.form("Stock Data")
+    container = st.container()
+
+    with form:
         defaultQuery = "SELECT * FROM `TCS`"
         query = st.text_input("SQL Query", defaultQuery)
         option = st.radio("Select Database", ('stock', 'index'))
@@ -131,8 +160,10 @@ with StockTab:
             db = INDICE_DATABASE_PATH
             if option == 'stock':
                 db = STOCK_DATABASE_PATH
-            st.dataframe(execute_query(db, query))
-
+            df = execute_query(db, query)
+            container.dataframe(df)
+            fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
+            container.plotly_chart(fig)
 
 with FileTab:
     dir_name = DATA_DIR_PATH

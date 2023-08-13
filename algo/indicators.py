@@ -12,21 +12,21 @@ class SupportResistanceIndicator:
         self.df = data
         self.tickerName = tickerName
         self.RRR = 1.5
-        # self.df['RSI'] = ta.rsi(data.Close, length=14)
-        # self.df["EMA14"] = ta.ema(data.Close, length=14)
-        # self.df["EMA26"] = ta.ema(data.Close, length=26)
+        # self.df['RSI'] = ta.rsi(data.CLOSE, length=14)
+        # self.df["EMA14"] = ta.ema(data.CLOSE, length=14)
+        # self.df["EMA26"] = ta.ema(data.CLOSE, length=26)
         # self.df['Level'] = 0
 
         # candle proximity with a level
-        self.proximity = (data.High.mean()-data.Low.mean()) / 4
+        self.proximity = (data.HIGH.mean()-data.LOW.mean()) / 4
         # proximity b/w levels
-        self.levelProximity = max(data.High)/100
+        self.levelProximity = max(data.HIGH)/100
 
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
-        supports = dfSlice[dfSlice.Low == dfSlice.Low.rolling(self.window, center=True).min()].Low
-        resistances = dfSlice[dfSlice.High == dfSlice.High.rolling(self.window, center=True).max()].High
+        supports = dfSlice[dfSlice.LOW == dfSlice.LOW.rolling(self.window, center=True).min()].LOW
+        resistances = dfSlice[dfSlice.HIGH == dfSlice.HIGH.rolling(self.window, center=True).max()].HIGH
         levels = pd.concat([supports, resistances])
         return levels
         # return levels[abs(levels.diff()) > self.levelProximity]
@@ -35,12 +35,12 @@ class SupportResistanceIndicator:
     def isCloseToResistance(self, candleIndex, levels):
         if len(levels)==0:
             return 0
-        minLevel = min(levels, key=lambda x:abs(x-self.df.High[candleIndex]))
-        c1 = abs(self.df.High[candleIndex]-minLevel)<=self.proximity
-        c2 = abs(max(self.df.Open[candleIndex],self.df.Close[candleIndex])-minLevel)<=self.proximity
-        c3 = min(self.df.Open[candleIndex],self.df.Close[candleIndex])<minLevel
-        c4 = self.df.Low[candleIndex]<minLevel
-        c5 = self.df.Close[candleIndex] > min(self.df.Close[candleIndex-self.backCandles:candleIndex-1])
+        minLevel = min(levels, key=lambda x:abs(x-self.df.HIGH[candleIndex]))
+        c1 = abs(self.df.HIGH[candleIndex]-minLevel)<=self.proximity
+        c2 = abs(max(self.df.OPEN[candleIndex],self.df.CLOSE[candleIndex])-minLevel)<=self.proximity
+        c3 = min(self.df.OPEN[candleIndex],self.df.CLOSE[candleIndex])<minLevel
+        c4 = self.df.LOW[candleIndex]<minLevel
+        c5 = self.df.CLOSE[candleIndex] > min(self.df.CLOSE[candleIndex-self.backCandles:candleIndex-1])
         if( (c1 or c2) and c3 and c4 and c5):
             return minLevel
         else:
@@ -50,12 +50,12 @@ class SupportResistanceIndicator:
     def isCloseToSupport(self, candleIndex, levels):
         if len(levels)==0:
             return 0
-        minLevel = min(levels, key=lambda x:abs(x-self.df.Low[candleIndex]))
-        c1 = abs(self.df.Low[candleIndex]-minLevel)<=self.proximity
-        c2 = abs(min(self.df.Open[candleIndex],self.df.Close[candleIndex])-minLevel)<=self.proximity
-        c3 = max(self.df.Open[candleIndex],self.df.Close[candleIndex])>minLevel
-        c4 = self.df.High[candleIndex]>minLevel
-        c5 = self.df.Close[candleIndex] < max(self.df.Close[candleIndex-self.backCandles:candleIndex-1])
+        minLevel = min(levels, key=lambda x:abs(x-self.df.LOW[candleIndex]))
+        c1 = abs(self.df.LOW[candleIndex]-minLevel)<=self.proximity
+        c2 = abs(min(self.df.OPEN[candleIndex],self.df.CLOSE[candleIndex])-minLevel)<=self.proximity
+        c3 = max(self.df.OPEN[candleIndex],self.df.CLOSE[candleIndex])>minLevel
+        c4 = self.df.HIGH[candleIndex]>minLevel
+        c5 = self.df.CLOSE[candleIndex] < max(self.df.CLOSE[candleIndex-self.backCandles:candleIndex-1])
         if( (c1 or c2) and c3 and c4 and c5):
             return minLevel
         else:
@@ -92,7 +92,10 @@ class SupportResistanceIndicator:
             start = 0
         dfSlice = self.df[start:candleIndex+1]
 
-        patternTitle = dfSlice['candlestick_pattern'][dfSlice.index.stop-1][3:].lower()
+        patternTitle = ""
+        if 'candlestick_pattern' in dfSlice:
+            patternTitle = dfSlice['candlestick_pattern'][dfSlice.index.stop-1][3:].lower()
+            
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
                vertical_spacing=0.05, subplot_titles=(self.tickerName, patternTitle), 
                row_width=[0.2, 0.7])
@@ -105,8 +108,8 @@ class SupportResistanceIndicator:
         levels = self.getLevels(candleIndex)
         # ------------------
         # for better visuals
-        levels = levels[levels > (min(dfSlice.Close) - self.levelProximity)]
-        levels = levels[levels < (max(dfSlice.High) + self.levelProximity)]
+        levels = levels[levels > (min(dfSlice.CLOSE) - self.levelProximity)]
+        levels = levels[levels < (max(dfSlice.HIGH) + self.levelProximity)]
         # ------------------
 
         # draw levels
@@ -127,14 +130,14 @@ class SupportResistanceIndicator:
             
         # draw candlestick
         fig.add_trace(go.Candlestick(x=dfSlice.index,
-                                open=dfSlice["Open"],
-                                high=dfSlice["High"],
-                                low=dfSlice["Low"],
-                                close=dfSlice["Close"]), row=1, col=1)
+                                open=dfSlice.OPEN,
+                                high=dfSlice.HIGH,
+                                low=dfSlice.LOW,
+                                close=dfSlice.CLOSE), row=1, col=1)
 
         # plot volume
-        if 'Volume' in dfSlice:
-            fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice['Volume'], showlegend=False), row=2, col=1)
+        if 'VOLUME' in dfSlice:
+            fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice.VOLUME, showlegend=False), row=2, col=1)
 
         # fig.add_scatter(x=dfSlice.index, y=dfSlice["SignalMarker"], mode="markers",
         #                 marker=dict(size=7, color="Black"), marker_symbol="hexagram", name="signal")
@@ -188,11 +191,11 @@ class SupportResistanceIndicator:
         if self.df['Signal'][candleIndex] == 2:
             support = self.df['Level'][candleIndex]
             sl = support - self.proximity
-            return self.df.Close[candleIndex] + abs(self.df.Close[candleIndex]-sl)*self.RRR
+            return self.df.CLOSE[candleIndex] + abs(self.df.CLOSE[candleIndex]-sl)*self.RRR
         elif self.df['Signal'][candleIndex] == 1:
             resistance = self.df['Level'][candleIndex]
             sl = resistance + self.proximity
-            return self.df.Close[candleIndex] - abs(self.df.Close[candleIndex]-sl)*self.RRR
+            return self.df.CLOSE[candleIndex] - abs(self.df.CLOSE[candleIndex]-sl)*self.RRR
         else:
             return np.nan
     
