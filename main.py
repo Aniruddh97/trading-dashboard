@@ -1,4 +1,3 @@
-import sqlite3
 import datetime
 import pandas as pd
 import streamlit as st
@@ -49,6 +48,12 @@ with st.sidebar:
             writeJSON(meta, METADATA_FILE_PATH)
         except Exception:
             st.toast("Update only possible on localhost")
+            
+    if st.button("Delete all data"):
+        dir_name = DATA_DIR_PATH
+        directoryItems = os.listdir(dir_name)
+        for item in directoryItems:
+            os.remove(os.path.join(dir_name, item))
 
 
 AnalysisTab, StockTab = st.tabs(["Analysis", "Stock"])
