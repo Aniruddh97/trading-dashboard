@@ -87,7 +87,7 @@ def bhavcopy_stock_range(start_date, end_date):
                     "VOLUME": row.TOTTRDQTY,
                 })
         except Exception as e:
-            st.toast(str(e))
+            st.toast(str(data))
             continue
     
     return stockData
@@ -125,7 +125,7 @@ def bhavcopy_index_range(start_date, end_date):
                     "VOLUME": row['Volume'],
                 })
         except Exception as e:
-            st.toast(str(e))
+            st.toast(str(data))
             continue
 
     return indiceData
@@ -134,6 +134,10 @@ def bhavcopy_index_range(start_date, end_date):
 def update_db_data(start_date, end_date):
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
+
+    if len(stockData.keys()) == 0 or len(indiceData.keys()) == 0:
+        st.error('Failed to fetch new data')
+        return
 
     i = 0
     conn = sqlite3.connect(STOCK_DATABASE_PATH)
