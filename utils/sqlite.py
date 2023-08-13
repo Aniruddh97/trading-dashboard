@@ -1,11 +1,14 @@
 import os
 import sqlite3
+import datetime
 import pandas as pd
 import streamlit as st
 
+from .live import *
+from .metadata import *
+from .constants import *
+from .datemodule import *
 from jugaad_data.nse import bhavcopy_save, bhavcopy_index_save
-from utils import getDateRange, readJSON, writeJSON, METADATA_FILE_PATH, INDICE_DATABASE_PATH, STOCK_DATABASE_PATH, DATA_DIR_PATH
-
 
 def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PATH):
     if os.path.isfile(database_path):
@@ -87,7 +90,7 @@ def bhavcopy_stock_range(start_date, end_date):
                     "VOLUME": row.TOTTRDQTY,
                 })
         except Exception as e:
-            st.toast(str(data))
+            st.toast(str(e))
             continue
     
     return stockData
@@ -125,7 +128,7 @@ def bhavcopy_index_range(start_date, end_date):
                     "VOLUME": row['Volume'],
                 })
         except Exception as e:
-            st.toast(str(data))
+            st.toast(str(e))
             continue
 
     return indiceData
@@ -136,21 +139,36 @@ def update_db_data(start_date, end_date):
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
 
     if len(stockData.keys()) == 0 or len(indiceData.keys()) == 0:
-        st.error('Failed to fetch new data')
-        return
+        st.warning('Failed to fetch from NSE, trying with yfinance for NIFTY 50')
+        meta = readJSON()
+        tickerList = meta['LIST']['NIFTY 100']
+        delta = end_date - start_date
+        stockData = get_live_data_collection(tickers=tickerList, period=f'{delta.days}d')
+        # convert df to dict
+        for stock in stockData:
+            stockData[stock] = stockData[stock].to_dict('records')
 
     i = 0
     conn = sqlite3.connect(STOCK_DATABASE_PATH)
     my_bar = st.sidebar.progress(0, text="Populating stock database")
     for stock in stockData:
+        read_query = f'''
+            SELECT * FROM `{stock}` ORDER BY `DATE` DESC LIMIT 1
+        '''
+        df = execute_query(STOCK_DATABASE_PATH, read_query)
+        if df is None:
+            continue
+
         i += 1
+        last_date = datetime.datetime.strptime(df['DATE'][0], DATE_FORMAT).date()
         query=f'''
             INSERT INTO `{stock}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
         for entry in stockData[stock]:
             try:
                 my_bar.progress(int((i)*(100/len(stockData.keys()))), text=f'Populating stock database : {stock}')
-                conn.execute(query, entry)
+                if entry['DATE'] > last_date:
+                    conn.execute(query, entry)
             except Exception as e:
                 st.toast(str(e))
         conn.commit()
@@ -158,16 +176,25 @@ def update_db_data(start_date, end_date):
 
     i = 0
     conn = sqlite3.connect(INDICE_DATABASE_PATH)
-    my_bar = st.sidebar.progress(0, text="Populating stock database")
+    my_bar = st.sidebar.progress(0, text="Populating index database")
     for indice in indiceData:
+        read_query = f'''
+            SELECT * FROM `{indice}` ORDER BY `DATE` DESC LIMIT 1
+        '''
+        df = execute_query(INDICE_DATABASE_PATH, read_query)
+        if df is None:
+            continue
+
         i += 1
+        last_date = datetime.datetime.strptime(df['DATE'][0], DATE_FORMAT).date()
         query=f'''
             INSERT INTO `{indice}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
         for entry in indiceData[indice]:
             try:
                 my_bar.progress(int((i)*(100/len(indiceData.keys()))), text=f'Populating index database : {indice}')
-                conn.execute(query, entry)
+                if entry['DATE'] > last_date:
+                    conn.execute(query, entry)
             except Exception as e:
                 st.toast(str(e))
         conn.commit()

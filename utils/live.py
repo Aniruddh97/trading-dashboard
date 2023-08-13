@@ -2,11 +2,13 @@ import pandas as pd
 import yfinance as yf
 import streamlit as st
 
-def get_live_data(ticker):
+def get_live_data(ticker, period='1d'):
     if 'NS' not in ticker:
         ticker = ticker + '.NS'
 
-    data = yf.download(ticker, interval='1d', period='1d', progress=False)
+    data = yf.download(ticker, interval='1d', period=period, progress=False)
+    if len(data.columns) != 6:
+        raise Exception(f"{ticker} data not found")
 
     data.insert(loc=0, column='Date', value=data.index)
     data.insert(loc=0, column='index', value=list(range(0,len(data.index))))
@@ -19,7 +21,7 @@ def get_live_data(ticker):
     return data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
 
 
-def get_live_data_collection(tickers):
+def get_live_data_collection(tickers, period='1d'):
     i=0
     live_collection = {}
     pbar = st.progress(0, text=f"Fetching live data")
@@ -27,9 +29,9 @@ def get_live_data_collection(tickers):
         i += 1
         try:
             pbar.progress(int((i)*(100/len(tickers))), text=f"Loading live data : {ticker}")
-            live_collection[ticker] = get_live_data(ticker)
+            live_collection[ticker] = get_live_data(ticker=ticker, period=period)
         except:
              st.toast(f'Live data unavailable for {ticker}')
              continue
-    pbar.progress(100, text="Live load completed")
+    pbar.progress(100, text="Live data load completed")
     return live_collection
