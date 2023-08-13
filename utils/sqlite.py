@@ -14,7 +14,7 @@ def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PAT
     
     conn = sqlite3.connect(database_path)
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
-
+    
     i = 0
     my_bar = st.sidebar.progress(0, text="Populating database")
     for stock in stockData:
@@ -33,7 +33,7 @@ def create_indice_database(start_date, end_date, database_path=INDICE_DATABASE_P
         
     conn = sqlite3.connect(database_path)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
-    
+   
     i = 0
     my_bar = st.sidebar.progress(0, text="Populating indice database")
     for index in indiceData:
@@ -60,14 +60,7 @@ def bhavcopy_stock_range(start_date, end_date):
             path = bhavcopy_save(current_date, DATA_DIR_PATH)
             data = pd.read_csv(path, encoding='latin-1')
             data = data[data['SERIES'] == 'EQ']
-
-            # remove csv files
-            dir_name = DATA_DIR_PATH
-            directoryItems = os.listdir(dir_name)
-            for item in directoryItems:
-                if item.endswith(".csv"):
-                    os.remove(os.path.join(dir_name, item))
-
+            os.remove(path)
 
             for index, row in data.iterrows():
                 if row.SYMBOL not in stockData:
@@ -100,14 +93,7 @@ def bhavcopy_index_range(start_date, end_date):
         try:
             path = bhavcopy_index_save(current_date, DATA_DIR_PATH)
             data = pd.read_csv(path, encoding='latin-1')
-
-            # remove csv files
-            dir_name = DATA_DIR_PATH
-            directoryItems = os.listdir(dir_name)
-            for item in directoryItems:
-                if item.endswith(".csv"):
-                    os.remove(os.path.join(dir_name, item))
-        
+            os.remove(path)
 
             for index, row in data.iterrows():
                 # whitelist

@@ -48,15 +48,18 @@ with st.sidebar:
             writeJSON(meta, METADATA_FILE_PATH)
         except Exception:
             st.toast("Update only possible on localhost")
-            
-    if st.button("Delete all data"):
+
+    
+    if st.button("Clear CSV files"):
+        # remove csv files
         dir_name = DATA_DIR_PATH
         directoryItems = os.listdir(dir_name)
         for item in directoryItems:
-            os.remove(os.path.join(dir_name, item))
+            if item.endswith(".csv"):
+                os.remove(os.path.join(dir_name, item))
+            
 
-
-AnalysisTab, StockTab = st.tabs(["Analysis", "Stock"])
+AnalysisTab, StockTab, FileTab = st.tabs(["Analysis", "Stock", "Files"])
 
 with AnalysisTab:
     ohlcData = live_data = None
@@ -84,6 +87,7 @@ with AnalysisTab:
         except Exception as e:
             st.toast(str(e))
 
+
 with StockTab:
     with st.form("Stock Data"):
         defaultQuery = "SELECT * FROM `TCS`"
@@ -95,3 +99,16 @@ with StockTab:
             if option == 'stock':
                 db = STOCK_DATABASE_PATH
             st.dataframe(execute_query(db, query))
+
+
+with FileTab:
+    dir_name = DATA_DIR_PATH
+    directoryItems = os.listdir(dir_name)
+    dir_struct = []
+    for item in directoryItems:
+        size = os.path.getsize(os.path.join(DATA_DIR_PATH, item))/(1024*1024)
+        dir_struct.append({
+            "File": item,
+            "Size (MB)": round(size,2)
+		})
+    st.dataframe(pd.DataFrame(dir_struct))
