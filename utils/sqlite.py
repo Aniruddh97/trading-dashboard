@@ -125,7 +125,7 @@ def bhavcopy_index_range(start_date, end_date):
                     "VOLUME": row['Volume'],
                 })
         except Exception as e:
-            st.toast(str(e))
+            st.toast(str(data))
             continue
 
     return indiceData
