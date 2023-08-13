@@ -157,13 +157,22 @@ with StockTab:
         option = st.radio("Select Database", ('stock', 'index'))
         submitted = st.form_submit_button("Display")
         if submitted:
-            db = INDICE_DATABASE_PATH
-            if option == 'stock':
-                db = STOCK_DATABASE_PATH
-            df = execute_query(db, query)
-            container.dataframe(df)
-            fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
-            container.plotly_chart(fig)
+            blacklisted = ['drop', 'alter', 'create', 'truncate', 'insert', 'delete', 'update']
+            proceed = True
+            for verb in blacklisted:
+                if verb in query.lower():
+                    st.error('DML operations are not allowed')
+                    proceed = False
+                    break
+                
+            if proceed:
+                db = INDICE_DATABASE_PATH
+                if option == 'stock':
+                    db = STOCK_DATABASE_PATH
+                df = execute_query(db, query)
+                container.dataframe(df)
+                fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
+                container.plotly_chart(fig)
 
 with FileTab:
     dir_name = DATA_DIR_PATH
