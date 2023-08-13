@@ -8,9 +8,11 @@ from utils import getDateRange, INDICE_DATABASE_PATH, STOCK_DATABASE_PATH, DATA_
 
 
 def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PATH):
-    os.remove(database_path)
-    conn = sqlite3.connect(database_path)
+    if os.path.isfile(database_path):
+        os.remove(database_path)
+        
     
+    conn = sqlite3.connect(database_path)
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
 
     i = 0
@@ -18,17 +20,18 @@ def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PAT
     for stock in stockData:
         i += 1
         df = pd.DataFrame(stockData[stock])
-        df.to_sql(name=stock, con=conn, if_exists='replace', index=False)
         my_bar.progress(int((i)*(100/len(stockData))), text=f'Populating database : {stock}')
+        df.to_sql(name=stock, con=conn, if_exists='replace', index=False)
         
     conn.commit()
     conn.close()
     
 
 def create_indice_database(start_date, end_date, database_path=INDICE_DATABASE_PATH):
-    os.remove(database_path)
+    if os.path.isfile(database_path):
+        os.remove(database_path)
+        
     conn = sqlite3.connect(database_path)
-    
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
     
     i = 0
@@ -36,8 +39,8 @@ def create_indice_database(start_date, end_date, database_path=INDICE_DATABASE_P
     for index in indiceData:
         i += 1
         df = pd.DataFrame(indiceData[index])
-        df.to_sql(name=index, con=conn, if_exists='replace', index=False)
         my_bar.progress(int((i)*(100/len(indiceData))), text=f'Populating indice database : {index}')
+        df.to_sql(name=index, con=conn, if_exists='replace', index=False)
         
     conn.commit()
     conn.close()

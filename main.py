@@ -62,25 +62,27 @@ with AnalysisTab:
     ohlcData = live_data = None
 
     with st.form("Indice Selection"):
-        meta = readJSON(METADATA_FILE_PATH)
-        selected_indice = st.selectbox('Select Index', meta['LIST']['INDICES'])
-        submitted = st.form_submit_button("Fetch Live Data")
-        if submitted:
-            if selected_indice in meta['LIST']:
-                tickers = meta['LIST'][selected_indice]
-                pbar = st.progress(0, text=f"Fetching live data for '{selected_indice}' stocks")
-                
-                live_data = get_live_data_collection(tickers=tickers)
-                pbar.progress(100, text="Live load completed")
+        try:
+            meta = readJSON(METADATA_FILE_PATH)
+            selected_indice = st.selectbox('Select Index', meta['LIST']['INDICES'])
+            submitted = st.form_submit_button("Fetch Live Data")
+            if submitted:
+                if selected_indice in meta['LIST']:
+                    tickers = meta['LIST'][selected_indice]
+                    pbar = st.progress(0, text=f"Fetching live data for '{selected_indice}' stocks")
+                    
+                    live_data = get_live_data_collection(tickers=tickers)
+                    pbar.progress(100, text="Live load completed")
 
-                ohlcData = load_db_data(tickers=tickers)
-                ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
-                for ticker in ohlcLiveData:
-                    st.write(ticker)
-                    st.dataframe(ohlcLiveData[ticker])
-            else:
-                st.toast(f'Company list for \'{selected_indice}\' not available')
-
+                    ohlcData = load_db_data(tickers=tickers)
+                    ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
+                    for ticker in ohlcLiveData:
+                        st.write(ticker)
+                        st.dataframe(ohlcLiveData[ticker])
+                else:
+                    st.toast(f'Company list for \'{selected_indice}\' not available')
+        except Exception as e:
+            st.toast(str(e))
 
 with StockTab:
     with st.form("Stock Data"):
