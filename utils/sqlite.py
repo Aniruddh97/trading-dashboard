@@ -52,6 +52,15 @@ def bhavcopy_stock_range(start_date, end_date):
     size = int((end_date - start_date).days)+1
     my_bar = st.sidebar.progress(0, text="Downloading stock data")
     
+    meta = readJSON(METADATA_FILE_PATH)
+    tickerList = []
+    if 'LIST' in meta:
+        tickerList = list(set([ticker for indice in meta['LIST'] for ticker in meta['LIST'][indice]]))
+    
+    if len(tickerList) == 0:
+        st.error("No stocks found in metadata file")
+        return {}
+    
     for current_date in getDateRange(start_date, end_date):
         i += 1
         my_bar.progress(int((i)*(100/size)), text='Downloading stock data')
@@ -63,6 +72,9 @@ def bhavcopy_stock_range(start_date, end_date):
             os.remove(path)
 
             for index, row in data.iterrows():
+                if row.SYMBOL not in tickerList:
+                    continue
+
                 if row.SYMBOL not in stockData:
                     stockData[row.SYMBOL] = []
                 
@@ -74,7 +86,8 @@ def bhavcopy_stock_range(start_date, end_date):
                     "CLOSE": row.CLOSE,
                     "VOLUME": row.TOTTRDQTY,
                 })
-        except:
+        except Exception as e:
+            st.toast(str(e))
             continue
     
     return stockData
@@ -111,7 +124,8 @@ def bhavcopy_index_range(start_date, end_date):
                     "CLOSE": row['Closing Index Value'],
                     "VOLUME": row['Volume'],
                 })
-        except:
+        except Exception as e:
+            st.toast(str(e))
             continue
 
     return indiceData

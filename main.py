@@ -69,7 +69,6 @@ with st.sidebar:
 
                 meta['LIST'] = {}
                 meta['LIST']['INDICES'] = nse.fetchIndices()['list']
-                whitelist = ["NIFTY 50","NIFTY NEXT 50","NIFTY 100","NIFTY 200","NIFTY 500","NIFTY BANK","NIFTY AUTO","NIFTY FIN SERVICE","NIFTY FINSRV25 50","NIFTY FMCG","NIFTY IT","NIFTY MEDIA"]
                 for indice in meta['LIST']['INDICES']:
                     try:
                         meta['LIST'][indice] = nse.fetchIndexStocks(indice)['list'][1:]
@@ -90,7 +89,7 @@ with st.sidebar:
                     os.remove(os.path.join(dir_name, item))
             
 
-AnalysisTab, StockTab, FileTab = st.tabs(["Analysis", "Stock", "Files"])
+AnalysisTab, WatchlistTab, StockTab, FileTab = st.tabs(["Analysis", "Watchlist", "Stock", "Files"])
 
 with AnalysisTab:
     ohlcData = live_data = None
@@ -146,6 +145,37 @@ with AnalysisTab:
         indicator_obj = st.session_state['analysis']['data']
         for ticker in rank.Ticker.to_list():
             st.plotly_chart(indicator_obj[ticker])
+
+
+with WatchlistTab:
+    meta = readJSON()
+    tickerList = []
+    if 'LIST' in meta:
+        tickerList = list(set([ticker for indice in meta['LIST'] for ticker in meta['LIST'][indice]]))
+    if 'watchlist' not in meta:
+        meta['watchlist'] = []
+
+    with st.form('Add to watchlist'):
+        ticker = st.selectbox('Search', tickerList)
+        submitted = st.form_submit_button("Add to watchlist")
+        if submitted:
+            meta['watchlist'].append(ticker)
+            writeJSON(meta)
+
+    with st.form('Remove to watchlist'):
+        ticker = st.selectbox('Search', meta['watchlist'])
+        submitted = st.form_submit_button("Remove from watchlist")
+        if submitted:
+            meta['watchlist'].remove(ticker)
+            writeJSON(meta)
+
+    ohlc_dict = load_db_data(meta['watchlist'])
+    for ticker in ohlc_dict:
+        df = ohlc_dict[ticker]
+        df = recognizePattern(df, all=False)
+        sri = SupportResistanceIndicator(df, 11, 5, ticker)
+        st.plotly_chart(sri.getIndicator(df.index.stop-1))
+        
 
 with StockTab:
     form = st.form("Stock Data")
