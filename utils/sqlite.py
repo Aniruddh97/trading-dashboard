@@ -135,6 +135,10 @@ def update_db_data(start_date, end_date):
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
 
+    if len(stockData.keys()) == 0 or len(indiceData.keys()) == 0:
+        st.error('Failed to fetch new data')
+        return
+
     i = 0
     conn = sqlite3.connect(STOCK_DATABASE_PATH)
     my_bar = st.sidebar.progress(0, text="Populating stock database")
