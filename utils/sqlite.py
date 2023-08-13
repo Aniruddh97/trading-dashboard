@@ -1,18 +1,16 @@
 import os
-import time
 import sqlite3
 import pandas as pd
 import streamlit as st
 
-from utils import getStartEndDate, getDateRange
 from jugaad_data.nse import bhavcopy_save, bhavcopy_index_save
+from utils import getDateRange, INDICE_DATABASE_PATH, STOCK_DATABASE_PATH, DATA_DIR_PATH
 
 
-def create_stock_database(database_path="./data/stock_database.sqlite", duration='1y'):
+def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PATH):
     os.remove(database_path)
     conn = sqlite3.connect(database_path)
     
-    start_date, end_date = getStartEndDate(duration)
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
 
     i = 0
@@ -27,11 +25,10 @@ def create_stock_database(database_path="./data/stock_database.sqlite", duration
     conn.close()
     
 
-def create_indice_database(database_path="./data/indice_database.sqlite",duration='1y'):
+def create_indice_database(start_date, end_date, database_path=INDICE_DATABASE_PATH):
     os.remove(database_path)
     conn = sqlite3.connect(database_path)
     
-    start_date, end_date = getStartEndDate(duration)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
     
     i = 0
@@ -57,12 +54,12 @@ def bhavcopy_stock_range(start_date, end_date):
         my_bar.progress(int((i)*(100/size)), text='Downloading stock data')
 
         try:
-            path = bhavcopy_save(current_date, "./data")
+            path = bhavcopy_save(current_date, DATA_DIR_PATH)
             data = pd.read_csv(path, encoding='latin-1')
             data = data[data['SERIES'] == 'EQ']
 
             # remove csv files
-            dir_name = "./data"
+            dir_name = DATA_DIR_PATH
             directoryItems = os.listdir(dir_name)
             for item in directoryItems:
                 if item.endswith(".csv"):
@@ -98,11 +95,11 @@ def bhavcopy_index_range(start_date, end_date):
         my_bar.progress(int((i)*(100/size)), text='Downloading index data')
 
         try:
-            path = bhavcopy_index_save(current_date, "./data")
+            path = bhavcopy_index_save(current_date, DATA_DIR_PATH)
             data = pd.read_csv(path, encoding='latin-1')
 
             # remove csv files
-            dir_name = "./data"
+            dir_name = DATA_DIR_PATH
             directoryItems = os.listdir(dir_name)
             for item in directoryItems:
                 if item.endswith(".csv"):
@@ -135,33 +132,47 @@ def update_db_data(start_date, end_date):
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
 
-    conn = sqlite3.connect("./data/stock_database.sqlite")
+    i = 0
+    conn = sqlite3.connect(STOCK_DATABASE_PATH)
+    my_bar = st.sidebar.progress(0, text="Populating stock database")
     for stock in stockData:
+        i += 1
         query=f'''
             INSERT INTO `{stock}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
         for entry in stockData[stock]:
-            conn.execute(query, entry)
+            try:
+                my_bar.progress(int((i)*(100/len(stockData.keys()))), text=f'Populating stock database : {stock}')
+                conn.execute(query, entry)
+            except Exception as e:
+                st.toast(str(e))
         conn.commit()
     conn.close()
 
-    conn = sqlite3.connect("./data/indice_database.sqlite")
+    i = 0
+    conn = sqlite3.connect(INDICE_DATABASE_PATH)
+    my_bar = st.sidebar.progress(0, text="Populating stock database")
     for indice in indiceData:
+        i += 1
         query=f'''
             INSERT INTO `{indice}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
         '''
         for entry in indiceData[indice]:
-            conn.execute(query, entry)
+            try:
+                my_bar.progress(int((i)*(100/len(indiceData.keys()))), text=f'Populating index database : {indice}')
+                conn.execute(query, entry)
+            except Exception as e:
+                st.toast(str(e))
         conn.commit()
     conn.close()
     
     st.toast("Data update completed")
 
-def load_db_data(stockList):
+def load_db_data(tickers):
     ohlcData = {}
-    for ticker in stockList:
+    for ticker in tickers:
         df = execute_query(
-            database_path='./data/stock_database.sqlite', 
+            database_path=STOCK_DATABASE_PATH, 
             query=f"SELECT * FROM `{ticker}`"
         )
         if df is not None:
@@ -169,7 +180,7 @@ def load_db_data(stockList):
             ohlcData[ticker] = df
         else:
             df = execute_query(
-                database_path='./data/indice_database.sqlite', 
+                database_path=INDICE_DATABASE_PATH, 
                 query=f"SELECT * FROM `{ticker}`"
             )
             if df is not None:
