@@ -18,71 +18,75 @@ with st.sidebar:
             writeJSON(meta, METADATA_FILE_PATH)
 
 
-    if st.button("Sync DB"):
-        meta = readJSON(METADATA_FILE_PATH)
-        if 'last_sync_date' in meta:
-            lastSyncDate = datetime.datetime.strptime(meta['last_sync_date'], DATE_FORMAT).date()
-            start_date = lastSyncDate + datetime.timedelta(days=1)
-            end_date = datetime.date.today()
+    with st.expander("DB Operations"):
 
-            if lastSyncDate == end_date:
-                st.toast("Data is up-to-date")
-            else:
-                update_db_data(start_date=start_date, end_date=end_date)
-        else:
-            st.toast("Please recreate database")
-            
-
-    if st.button("Load Backup DB"):
-        if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
-            if os.path.isfile(INDICE_DATABASE_PATH):
-                os.remove(INDICE_DATABASE_PATH)
-            shutil.copyfile(INDICE_DATABASE_BACKUP_PATH, INDICE_DATABASE_PATH)
-        
-        if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
-            if os.path.isfile(STOCK_DATABASE_PATH):
-                os.remove(STOCK_DATABASE_PATH)
-            shutil.copyfile(STOCK_DATABASE_BACKUP_PATH, STOCK_DATABASE_PATH)
-            
-
-    if st.button("Backup DB"):
-        if os.path.isfile(INDICE_DATABASE_PATH):
-            if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
-                os.remove(INDICE_DATABASE_BACKUP_PATH)
-            shutil.copyfile(INDICE_DATABASE_PATH, INDICE_DATABASE_BACKUP_PATH)
-        
-        if os.path.isfile(STOCK_DATABASE_PATH):
-            if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
-                os.remove(STOCK_DATABASE_BACKUP_PATH)
-            shutil.copyfile(STOCK_DATABASE_PATH, STOCK_DATABASE_BACKUP_PATH)
-
-
-    if st.button("Update Stock List"):
-        try:
-            nse = NSE()
+        if st.button("Sync DB"):
             meta = readJSON(METADATA_FILE_PATH)
+            if 'last_sync_date' in meta:
+                lastSyncDate = datetime.datetime.strptime(meta['last_sync_date'], DATE_FORMAT).date()
+                start_date = lastSyncDate + datetime.timedelta(days=1)
+                end_date = datetime.date.today()
 
-            meta['LIST'] = {}
-            meta['LIST']['INDICES'] = nse.fetchIndices()['list']
-            whitelist = ["NIFTY 50","NIFTY NEXT 50","NIFTY 100","NIFTY 200","NIFTY 500","NIFTY BANK","NIFTY AUTO","NIFTY FIN SERVICE","NIFTY FINSRV25 50","NIFTY FMCG","NIFTY IT","NIFTY MEDIA"]
-            for indice in meta['LIST']['INDICES']:
-                try:
-                    meta['LIST'][indice] = nse.fetchIndexStocks(indice)['list'][1:]
-                except:
-                    st.toast(f'Data unavailable for {indice}')
+                if lastSyncDate == end_date:
+                    st.toast("Data is up-to-date")
+                else:
+                    update_db_data(start_date=start_date, end_date=end_date)
+            else:
+                st.toast("Please recreate database")
+                
+        if st.button("Backup DB"):
+            if os.path.isfile(INDICE_DATABASE_PATH):
+                if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
+                    os.remove(INDICE_DATABASE_BACKUP_PATH)
+                shutil.copyfile(INDICE_DATABASE_PATH, INDICE_DATABASE_BACKUP_PATH)
+            
+            if os.path.isfile(STOCK_DATABASE_PATH):
+                if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
+                    os.remove(STOCK_DATABASE_BACKUP_PATH)
+                shutil.copyfile(STOCK_DATABASE_PATH, STOCK_DATABASE_BACKUP_PATH)
 
-            writeJSON(meta, METADATA_FILE_PATH)
-        except Exception:
-            st.toast("Update only possible on localhost")
+        if st.button("Load Backup DB"):
+            if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
+                if os.path.isfile(INDICE_DATABASE_PATH):
+                    os.remove(INDICE_DATABASE_PATH)
+                shutil.copyfile(INDICE_DATABASE_BACKUP_PATH, INDICE_DATABASE_PATH)
+            
+            if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
+                if os.path.isfile(STOCK_DATABASE_PATH):
+                    os.remove(STOCK_DATABASE_PATH)
+                shutil.copyfile(STOCK_DATABASE_BACKUP_PATH, STOCK_DATABASE_PATH)
+                
 
-    
-    if st.button("Clear CSV files"):
-        # remove csv files
-        dir_name = DATA_DIR_PATH
-        directoryItems = os.listdir(dir_name)
-        for item in directoryItems:
-            if item.endswith(".csv"):
-                os.remove(os.path.join(dir_name, item))
+
+
+    with st.expander("Other Operations"):
+
+        if st.button("Update Stock List"):
+            try:
+                nse = NSE()
+                meta = readJSON(METADATA_FILE_PATH)
+
+                meta['LIST'] = {}
+                meta['LIST']['INDICES'] = nse.fetchIndices()['list']
+                whitelist = ["NIFTY 50","NIFTY NEXT 50","NIFTY 100","NIFTY 200","NIFTY 500","NIFTY BANK","NIFTY AUTO","NIFTY FIN SERVICE","NIFTY FINSRV25 50","NIFTY FMCG","NIFTY IT","NIFTY MEDIA"]
+                for indice in meta['LIST']['INDICES']:
+                    try:
+                        meta['LIST'][indice] = nse.fetchIndexStocks(indice)['list'][1:]
+                    except:
+                        st.toast(f'Data unavailable for {indice}')
+
+                writeJSON(meta, METADATA_FILE_PATH)
+            except Exception:
+                st.toast("Update only possible on localhost")
+
+        
+        if st.button("Clear CSV files"):
+            # remove csv files
+            dir_name = DATA_DIR_PATH
+            directoryItems = os.listdir(dir_name)
+            for item in directoryItems:
+                if item.endswith(".csv"):
+                    os.remove(os.path.join(dir_name, item))
             
 
 AnalysisTab, StockTab, FileTab = st.tabs(["Analysis", "Stock", "Files"])
