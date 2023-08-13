@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from jugaad_data.nse import bhavcopy_save, bhavcopy_index_save
-from utils import getDateRange, INDICE_DATABASE_PATH, STOCK_DATABASE_PATH, DATA_DIR_PATH
+from utils import getDateRange, readJSON, writeJSON, METADATA_FILE_PATH, INDICE_DATABASE_PATH, STOCK_DATABASE_PATH, DATA_DIR_PATH
 
 
 def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PATH):
@@ -154,6 +154,10 @@ def update_db_data(start_date, end_date):
                 st.toast(str(e))
         conn.commit()
     conn.close()
+    
+    meta = readJSON(METADATA_FILE_PATH)
+    meta['last_sync_date'] = end_date
+    writeJSON(meta, METADATA_FILE_PATH)
     
     st.toast("Data update completed")
 

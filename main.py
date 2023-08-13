@@ -1,3 +1,4 @@
+import shutil
 import datetime
 import pandas as pd
 import streamlit as st
@@ -16,6 +17,7 @@ with st.sidebar:
             meta['last_sync_date'] = end_date
             writeJSON(meta, METADATA_FILE_PATH)
 
+
     if st.button("Sync DB"):
         meta = readJSON(METADATA_FILE_PATH)
         if 'last_sync_date' in meta:
@@ -29,6 +31,30 @@ with st.sidebar:
                 update_db_data(start_date=start_date, end_date=end_date)
         else:
             st.toast("Please recreate database")
+            
+
+    if st.button("Load Backup DB"):
+        if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
+            if os.path.isfile(INDICE_DATABASE_PATH):
+                os.remove(INDICE_DATABASE_PATH)
+            shutil.copyfile(INDICE_DATABASE_BACKUP_PATH, INDICE_DATABASE_PATH)
+        
+        if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
+            if os.path.isfile(STOCK_DATABASE_PATH):
+                os.remove(STOCK_DATABASE_PATH)
+            shutil.copyfile(STOCK_DATABASE_BACKUP_PATH, STOCK_DATABASE_PATH)
+            
+
+    if st.button("Backup DB"):
+        if os.path.isfile(INDICE_DATABASE_PATH):
+            if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
+                os.remove(INDICE_DATABASE_BACKUP_PATH)
+            shutil.copyfile(INDICE_DATABASE_PATH, INDICE_DATABASE_BACKUP_PATH)
+        
+        if os.path.isfile(STOCK_DATABASE_PATH):
+            if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
+                os.remove(STOCK_DATABASE_BACKUP_PATH)
+            shutil.copyfile(STOCK_DATABASE_PATH, STOCK_DATABASE_BACKUP_PATH)
 
 
     if st.button("Update Stock List"):
@@ -79,9 +105,12 @@ with AnalysisTab:
 
                     ohlcData = load_db_data(tickers=tickers)
                     ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
+                    
                     for ticker in ohlcLiveData:
                         st.write(ticker)
                         st.dataframe(ohlcLiveData[ticker])
+                        
+                    
                 else:
                     st.toast(f'Company list for \'{selected_indice}\' not available')
         except Exception as e:
@@ -110,5 +139,5 @@ with FileTab:
         dir_struct.append({
             "File": item,
             "Size (MB)": round(size,2)
-		})
+        })
     st.dataframe(pd.DataFrame(dir_struct))
