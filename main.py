@@ -11,7 +11,6 @@ with st.sidebar:
         submitted = st.form_submit_button("Recreate DB")
         if submitted:
             start_date, end_date = getStartEndDate(duration)
-            end_date = datetime.date(2023, 8, 9)
             create_indice_database(start_date=start_date, end_date=end_date)
             create_stock_database(start_date=start_date, end_date=end_date)
             meta = readJSON(METADATA_FILE_PATH)

@@ -18,6 +18,7 @@ def merge_data(ohlc_obj_df, data_obj_df):
                 dfC = pd.concat([dfA, dfB], ignore_index=True)
                 latestData[stock] = dfC
         except:
+            latestData[stock] = ohlc_obj_df[stock]
             st.toast(f'failed to merge {stock} data')
 
     return latestData
