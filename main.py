@@ -12,15 +12,18 @@ with st.sidebar:
     
     if 'status' not in st.session_state:
         market_status = is_market_open()
-        if market_status == -1:
-            st.error('Market is Closed')
-        elif market_status == 0:
-            st.warning('Error fetching market status')
-        elif market_status == 1:
-            st.success('Market is Open')
         st.session_state['status'] = market_status
+    else:
+        market_status= st.session_state['status']
+    
+    if market_status == -1:
+        st.error('Market is Closed')
+    elif market_status == 0:
+        st.warning('Error fetching market status')
+    elif market_status == 1:
+        st.success('Market is Open')
+    
         
-
     with st.form("Recreate DB Form"):
         duration = st.text_input('Time Duration', '2y')
         submitted = st.form_submit_button("Recreate DB")
@@ -103,7 +106,7 @@ with st.sidebar:
         
 
         if st.button("Refresh Market Status"):
-            st.session_status['status'] = is_market_open()
+            st.session_state['status'] = is_market_open()
 
         
 chosen_tab = stx.tab_bar(data=[
