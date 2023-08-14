@@ -170,6 +170,7 @@ with WatchlistTab:
         tickerList = list(set([ticker for indice in meta['LIST'] for ticker in meta['LIST'][indice]]))
     if 'watchlist' not in meta:
         meta['watchlist'] = []
+        st.session_state['watchlist'] = []
 
     with st.form('Add to watchlist'):
         ticker = st.selectbox('Search', tickerList)
@@ -177,6 +178,7 @@ with WatchlistTab:
         if submitted:
             meta['watchlist'].append(ticker)
             writeJSON(meta)
+            st.session_state['watchlist'] = []
 
     with st.form('Remove to watchlist'):
         ticker = st.selectbox('Search', meta['watchlist'])
@@ -187,16 +189,26 @@ with WatchlistTab:
 
     watchlist = meta['watchlist']
     if len(watchlist) > 0:
-        live_data = {}
-        if st.session_state['status'] == 1:
-            live_data = get_live_data_collection(tickers=watchlist)
-        ohlc_obj_df = load_db_data(watchlist)
-        ohlc_obj_df = merge_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
-        for ticker in ohlc_obj_df:
-            df = ohlc_obj_df[ticker]
-            df = recognizePattern(df, all=True)
-            sri = SupportResistanceIndicator(df, 11, 5, ticker)
-            st.plotly_chart(sri.getIndicator(df.index.stop-1))
+        if 'watchlist' in st.session_state and len(st.session_state['watchlist']) != 0 and st.session_state['status'] != 1:
+            for chart in st.session_state['watchlist']:
+                st.plotly_chart(chart)
+        else:
+            st.session_state['watchlist'] = []
+            
+            live_data = {}
+            if st.session_state['status'] == 1:
+                live_data = get_live_data_collection(tickers=watchlist)
+            ohlc_obj_df = load_db_data(watchlist)
+            ohlc_obj_df = merge_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
+            
+            for ticker in ohlc_obj_df:
+                df = ohlc_obj_df[ticker]
+                df = recognizePattern(df, all=True)
+                sri = SupportResistanceIndicator(df, 11, 5, ticker)
+                chart = sri.getIndicator(df.index.stop-1)
+                st.plotly_chart(chart)
+                st.session_state['watchlist'].append(chart)
+            
     else:
         st.info('Watchlist is empty')
         
