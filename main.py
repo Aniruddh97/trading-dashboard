@@ -2,6 +2,7 @@ import shutil
 import datetime
 import pandas as pd
 import streamlit as st
+import extra_streamlit_components as stx
 
 from algo import *
 from utils import *
@@ -9,14 +10,15 @@ from utils import *
 
 with st.sidebar:
     
-    market_status = is_market_open()
-    if market_status == -1:
-        st.error('Market is Closed')
-    elif market_status == 0:
-        st.warning('Error fetching market status')
-    elif market_status == 1:
-        st.success('Market is Open')
-    st.session_state['status'] = market_status
+    if 'status' not in st.session_state:
+        market_status = is_market_open()
+        if market_status == -1:
+            st.error('Market is Closed')
+        elif market_status == 0:
+            st.warning('Error fetching market status')
+        elif market_status == 1:
+            st.success('Market is Open')
+        st.session_state['status'] = market_status
         
 
     with st.form("Recreate DB Form"):
@@ -74,6 +76,14 @@ with st.sidebar:
 
     with st.expander("Other Operations"):
 
+        if st.button("Clear CSV files"):
+            # remove csv files
+            dir_name = DATA_DIR_PATH
+            directoryItems = os.listdir(dir_name)
+            for item in directoryItems:
+                if item.endswith(".csv"):
+                    os.remove(os.path.join(dir_name, item))
+
         if st.button("Update Stock List"):
             try:
                 nse = NSE()
@@ -90,20 +100,19 @@ with st.sidebar:
                 writeJSON(meta, METADATA_FILE_PATH)
             except Exception:
                 st.toast("Update only possible on localhost")
+        
+
+        if st.button("Refresh Market Status"):
+            st.session_status['status'] = is_market_open()
 
         
-        if st.button("Clear CSV files"):
-            # remove csv files
-            dir_name = DATA_DIR_PATH
-            directoryItems = os.listdir(dir_name)
-            for item in directoryItems:
-                if item.endswith(".csv"):
-                    os.remove(os.path.join(dir_name, item))
-            
+chosen_tab = stx.tab_bar(data=[
+    stx.TabBarItemData(id="analysis", title="Analysis", description=""),
+    stx.TabBarItemData(id="watchlist", title="Watchlist", description=""),
+    stx.TabBarItemData(id="stock", title="Stock", description=""),
+    stx.TabBarItemData(id="files", title="Files", description="")])
 
-AnalysisTab, WatchlistTab, StockTab, FileTab = st.tabs(["Analysis", "Watchlist", "Stock", "Files"])
-
-with AnalysisTab:
+if chosen_tab == "analysis":
     ohlcData = live_data = None
 
     with st.form("Indice Selection"):
@@ -163,7 +172,7 @@ with AnalysisTab:
             st.plotly_chart(indicator_obj[ticker])
 
 
-with WatchlistTab:
+if chosen_tab == "watchlist":
     meta = readJSON()
     tickerList = []
     if 'LIST' in meta:
@@ -213,7 +222,7 @@ with WatchlistTab:
         st.info('Watchlist is empty')
         
 
-with StockTab:
+if chosen_tab == "stock":
     form = st.form("Stock Data")
     container = st.container()
 
@@ -240,7 +249,7 @@ with StockTab:
                 fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
                 container.plotly_chart(fig)
 
-with FileTab:
+if chosen_tab == "files":
     dir_name = DATA_DIR_PATH
     directoryItems = os.listdir(dir_name)
     dir_struct = []
