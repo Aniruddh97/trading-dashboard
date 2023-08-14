@@ -18,6 +18,12 @@ def get_live_data(ticker, period='1d'):
         data = data.drop(['Close'], axis=1)
         data.rename(columns={'Adj Close': 'Close'}, inplace=True)
     data.rename(columns={'Date': 'DATE', 'Open': 'OPEN', 'High': 'HIGH','Low': 'LOW', 'Close': 'CLOSE', 'Volume': 'VOLUME'}, inplace=True)
+    
+    data.OPEN = data.OPEN.round(2)
+    data.HIGH = data.HIGH.round(2)
+    data.LOW = data.LOW.round(2)
+    data.CLOSE = data.OPEN.round(2)
+    
     return data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
 
 

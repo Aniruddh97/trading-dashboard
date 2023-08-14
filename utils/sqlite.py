@@ -226,7 +226,59 @@ def load_db_data(tickers):
                 ohlcData[ticker] = df
                 
     return ohlcData
-                    
+
+
+def replace_table(table, df):
+    if df.empty:
+        return
+    
+    query = f'''
+        DROP TABLE IF EXISTS `{table}`
+    '''
+
+    if does_exist(table=table, db_path=STOCK_DATABASE_PATH):
+        conn = sqlite3.connect(STOCK_DATABASE_PATH)
+        try:
+            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
+        except:
+            execute_query(database_path=STOCK_DATABASE_PATH, query=query)
+            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
+
+        conn.commit()
+        conn.close()
+
+    elif does_exist(table=table, db_path=INDICE_DATABASE_PATH):
+        conn = sqlite3.connect(INDICE_DATABASE_PATH)
+        try:
+            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
+        except:
+            execute_query(database_path=INDICE_DATABASE_PATH, query=query)
+            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
+            
+        conn.commit()
+        conn.close()
+    else:
+        st.toast(f'{table} does not exist')
+
+
+def does_exist(table, db_path):
+    exists = False
+
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+                
+    #get the count of tables with the name
+    c.execute(f'''SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table}' ''')
+
+    #if the count is 1, then table exists
+    if c.fetchone()[0] == 1:
+        exists = True
+    
+    conn.commit()
+    conn.close()
+
+    return exists
+
 
 def execute_query(database_path, query):
     df = None

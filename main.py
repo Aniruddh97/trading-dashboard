@@ -113,7 +113,8 @@ chosen_tab = stx.tab_bar(data=[
     stx.TabBarItemData(id="analysis", title="Analysis", description=""),
     stx.TabBarItemData(id="watchlist", title="Watchlist", description=""),
     stx.TabBarItemData(id="stock", title="Stock", description=""),
-    stx.TabBarItemData(id="files", title="Files", description="")])
+    stx.TabBarItemData(id="files", title="Files", description=""),
+    stx.TabBarItemData(id="reconcile", title="Reconcile", description="")])
 
 if chosen_tab == "analysis":
     ohlcData = live_data = None
@@ -133,7 +134,7 @@ if chosen_tab == "analysis":
                         live_data = get_live_data_collection(tickers=tickers)
 
                     ohlcData = load_db_data(tickers=tickers)
-                    ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
+                    ohlcLiveData = append_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
                     
                     i = 0
                     analysis = {}
@@ -211,7 +212,7 @@ if chosen_tab == "watchlist":
             if st.session_state['status'] == 1:
                 live_data = get_live_data_collection(tickers=watchlist)
             ohlc_obj_df = load_db_data(watchlist)
-            ohlc_obj_df = merge_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
+            ohlc_obj_df = append_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
             
             for ticker in ohlc_obj_df:
                 df = ohlc_obj_df[ticker]
@@ -252,6 +253,7 @@ if chosen_tab == "stock":
                 fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
                 container.plotly_chart(fig)
 
+
 if chosen_tab == "files":
     dir_name = DATA_DIR_PATH
     directoryItems = os.listdir(dir_name)
@@ -263,3 +265,16 @@ if chosen_tab == "files":
             "Size (MB)": round(size,2)
         })
     st.dataframe(pd.DataFrame(dir_struct))
+
+
+if chosen_tab == "reconcile":
+    with st.form("Reconcile Segment Form"):
+        meta = readJSON(METADATA_FILE_PATH)
+        key = st.selectbox('Segment', meta['LIST'].keys())
+        period = st.selectbox('Period', ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'])
+        submitted = st.form_submit_button("Reconcile")
+        if submitted:
+            tickers = meta['LIST'][key]
+            db_df_obj = load_db_data(tickers=tickers)
+            reconcile_data(df_dict=db_df_obj, period=period)
+                    

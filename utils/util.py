@@ -3,9 +3,11 @@ import datetime
 import pandas as pd
 import streamlit as st
 
+from .live import *
+from .sqlite import *
 from zoneinfo import ZoneInfo
 
-def merge_data(ohlc_obj_df, data_obj_df):
+def append_data(ohlc_obj_df, data_obj_df):
     latestData = {}
     if len(data_obj_df.keys()) == 0:
         return ohlc_obj_df
@@ -21,13 +23,48 @@ def merge_data(ohlc_obj_df, data_obj_df):
                 recent_live_date = row['DATE']
                 if  recent_live_date > recent_db_date:
                     ohlc_obj_df[stock] = pd.concat([ohlc_obj_df[stock], pd.DataFrame([row])], ignore_index=True)
-                
             latestData[stock] = ohlc_obj_df[stock]
         except:
             latestData[stock] = ohlc_obj_df[stock]
             st.toast(f'failed to merge {stock} data')
 
     return latestData
+
+
+def reconcile_data(df_dict, period):
+    pbar = st.progress(0, text=f"Analyzing data")
+
+    i = 0
+    for ticker in df_dict:
+        i += 1
+        pbar.progress(int((i)*(100/len(df_dict.keys()))), text=f"Reconciling {ticker}")
+
+        db_df = df_dict[ticker]
+        new_df = get_live_data(ticker=ticker, period=period)
+
+        for _, row in new_df.iterrows():
+            append_list = []
+            index_list = db_df.index[db_df.DATE == row.DATE].tolist()
+            
+            if len(index_list) == 1:
+                db_index = index_list[0]
+                db_df.loc[db_index, ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']] = [row.OPEN, row.HIGH, row.LOW, row.CLOSE, row.VOLUME]
+            elif len(index_list) == 0:
+                append_list.append({
+                    "DATE": row.DATE,
+                    "OPEN": row.OPEN,
+                    "HIGH": row.HIGH,
+                    "LOW": row.LOW,
+                    "CLOSE": row.CLOSE,
+                    "VOLUME": row.VOLUME,
+                })
+
+        if len(append_list) > 0:
+            db_df = pd.concat([db_df, pd.DataFrame(append_list)], ignore_index=True)
+
+        replace_table(table=ticker, df=db_df)
+
+    pbar.progress(100, text=f"Reconciliation complete")
 
 
 def is_market_open():
