@@ -3,10 +3,22 @@ import datetime
 import pandas as pd
 import streamlit as st
 
-from utils import *
 from algo import *
+from utils import *
+
 
 with st.sidebar:
+    
+    market_status = is_market_open()
+    if market_status == -1:
+        st.error('Market is Closed')
+    elif market_status == 0:
+        st.warning('Error fetching market status')
+    elif market_status == 1:
+        st.success('Market is Open')
+    st.session_state['status'] = market_status
+        
+
     with st.form("Recreate DB Form"):
         duration = st.text_input('Time Duration', '2y')
         submitted = st.form_submit_button("Recreate DB")
@@ -104,7 +116,9 @@ with AnalysisTab:
                 if selected_indice in meta['LIST']:
                     tickers = meta['LIST'][selected_indice]
                     
-                    live_data = get_live_data_collection(tickers=tickers)
+                    live_data = {}
+                    if st.session_state['status'] == 1:
+                        live_data = get_live_data_collection(tickers=tickers)
 
                     ohlcData = load_db_data(tickers=tickers)
                     ohlcLiveData = merge_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
@@ -169,12 +183,20 @@ with WatchlistTab:
             meta['watchlist'].remove(ticker)
             writeJSON(meta)
 
-    ohlc_dict = load_db_data(meta['watchlist'])
-    for ticker in ohlc_dict:
-        df = ohlc_dict[ticker]
-        df = recognizePattern(df, all=False)
-        sri = SupportResistanceIndicator(df, 11, 5, ticker)
-        st.plotly_chart(sri.getIndicator(df.index.stop-1))
+    watchlist = meta['watchlist']
+    if len(watchlist) > 0:
+        live_data = {}
+        if st.session_state['status'] == 1:
+            live_data = get_live_data_collection(tickers=watchlist)
+        ohlc_obj_df = load_db_data(watchlist)
+        ohlc_obj_df = merge_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
+        for ticker in ohlc_obj_df:
+            df = ohlc_obj_df[ticker]
+            df = recognizePattern(df, all=True)
+            sri = SupportResistanceIndicator(df, 11, 5, ticker)
+            st.plotly_chart(sri.getIndicator(df.index.stop-1))
+    else:
+        st.info('Watchlist is empty')
         
 
 with StockTab:
