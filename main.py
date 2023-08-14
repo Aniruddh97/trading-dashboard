@@ -154,7 +154,9 @@ with AnalysisTab:
     if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
         rank = pd.DataFrame(st.session_state['analysis']['rank'])
         rank = rank.sort_values(by='Pattern Rank', ascending=True)
-        st.dataframe(rank)
+        rank_for_display = rank[rank.Pattern != 'NO_PATTERN']
+        if not rank_for_display.empty:
+            st.dataframe(rank_for_display)
 
         indicator_obj = st.session_state['analysis']['data']
         for ticker in rank.Ticker.to_list():
