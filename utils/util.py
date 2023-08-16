@@ -85,7 +85,7 @@ def is_market_open():
         
         nse = nse[0]
         now_time = datetime.datetime.now(tz=ZoneInfo(nse['tz'])).strftime("%H:%M")
-        if now_time <= nse['close'] and now_time >= nse['open']:
+        if now_time < nse['close'] and now_time >= nse['open']:
             return 1
 
     except Exception as e:
