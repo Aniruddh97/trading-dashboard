@@ -203,6 +203,7 @@ if chosen_tab == "watchlist":
         if submitted:
             meta['watchlist'].remove(ticker)
             writeJSON(meta)
+            st.session_state['watchlist'] = []
 
     watchlist = meta['watchlist']
     if len(watchlist) > 0:
