@@ -26,7 +26,7 @@ def get_live_data(ticker, period='1d', interval='1d'):
     
     data = data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
 
-    if interval == '1d' and not data.empty:
+    if period == '1d' and interval == '1d' and not data.empty:
         first = data.head(1)
         last = get_live_data(ticker=ticker, period=period, interval='1m').tail(1)
         return pd.DataFrame([{
