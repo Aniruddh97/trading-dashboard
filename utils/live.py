@@ -2,11 +2,11 @@ import pandas as pd
 import yfinance as yf
 import streamlit as st
 
-def get_live_data(ticker, period='1d'):
+def get_live_data(ticker, period='1d', interval='1d'):
     if 'NS' not in ticker:
         ticker = ticker + '.NS'
 
-    data = yf.download(ticker, interval='1d', period=period, progress=False)
+    data = yf.download(ticker, interval=interval, period=period, progress=False)
     if len(data.columns) != 6:
         raise Exception(f"{ticker} data not found")
 
@@ -14,9 +14,9 @@ def get_live_data(ticker, period='1d'):
     data.insert(loc=0, column='index', value=list(range(0,len(data.index))))
     data['Date'] = pd.to_datetime(data.Date).dt.date
     data = data.set_index('index').reset_index().drop(['index'], axis=1)
-    if 'Adj Close' in data:
-        data = data.drop(['Close'], axis=1)
-        data.rename(columns={'Adj Close': 'Close'}, inplace=True)
+    # if 'Adj Close' in data:
+    #     data = data.drop(['Close'], axis=1)
+    #     data.rename(columns={'Adj Close': 'Close'}, inplace=True)
     data.rename(columns={'Date': 'DATE', 'Open': 'OPEN', 'High': 'HIGH','Low': 'LOW', 'Close': 'CLOSE', 'Volume': 'VOLUME'}, inplace=True)
     
     data.OPEN = data.OPEN.round(2)
@@ -24,7 +24,20 @@ def get_live_data(ticker, period='1d'):
     data.LOW = data.LOW.round(2)
     data.CLOSE = data.OPEN.round(2)
     
-    return data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
+    data = data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
+
+    if interval == '1d' and not data.empty:
+        first = data.head(1)
+        last = get_live_data(ticker=ticker, period=period, interval='1m').tail(1)
+        return pd.DataFrame([{
+            'DATE': first.DATE[first.index.stop-1],
+            'OPEN': first.OPEN[first.index.stop-1],
+            'HIGH': first.HIGH[first.index.stop-1],
+            'LOW': first.LOW[first.index.stop-1],
+            'CLOSE': last.CLOSE[last.index.stop-1],
+            'VOLUME': first.VOLUME[first.index.stop-1],
+        }])
+    return data
 
 
 def get_live_data_collection(tickers, period='1d'):
