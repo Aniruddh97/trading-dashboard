@@ -67,6 +67,9 @@ def bhavcopy_stock_range(start_date, end_date):
     for current_date in getDateRange(start_date, end_date):
         i += 1
         my_bar.progress(int((i)*(100/size)), text='Downloading stock data')
+        
+        if current_date.weekday() == 5 or current_date.weekday() == 6:
+            continue
 
         try:
             path = bhavcopy_save(current_date, DATA_DIR_PATH)
@@ -105,6 +108,9 @@ def bhavcopy_index_range(start_date, end_date):
     for current_date in getDateRange(start_date, end_date):
         i += 1
         my_bar.progress(int((i)*(100/size)), text='Downloading index data')
+
+        if current_date.weekday() == 5 or current_date.weekday() == 6:
+            continue
 
         try:
             path = bhavcopy_index_save(current_date, DATA_DIR_PATH)
