@@ -69,6 +69,15 @@ def reconcile_data(df_dict, period):
 
 def is_market_open():
     try:
+        meta = readJSON(METADATA_FILE_PATH)
+        if 'Holidays' in meta:
+            holidays = meta['Holidays']
+            for holiday in holidays:
+                hdate = datetime.datetime.strptime(holiday, DATE_FORMAT).date()
+                if hdate == datetime.date.today():
+                    st.write(hdate)
+                    return -1
+
         market_json = requests.get("https://www.isthemarketopen.com/static/markets.json").json()
         nse = [market for market in market_json if market['id'] == 'NSE' and market['country'] == 'India']
         if len(nse) == 0:

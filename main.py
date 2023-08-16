@@ -87,22 +87,26 @@ with st.sidebar:
                 if item.endswith(".csv"):
                     os.remove(os.path.join(dir_name, item))
 
-        if st.button("Update Stock List"):
-            try:
-                nse = NSE()
-                meta = readJSON(METADATA_FILE_PATH)
+        if st.button("Update Metadata"):
+            with st.spinner('Updating...'):
+                try:
+                    nse = NSE()
+                    meta = readJSON(METADATA_FILE_PATH)
+                    
+                    holidays = nse.fetchHolidayList()
+                    meta['Holidays'] = holidays
 
-                meta['LIST'] = {}
-                meta['LIST']['INDICES'] = nse.fetchIndices()['list']
-                for indice in meta['LIST']['INDICES']:
-                    try:
-                        meta['LIST'][indice] = nse.fetchIndexStocks(indice)['list'][1:]
-                    except:
-                        st.toast(f'Data unavailable for {indice}')
+                    meta['LIST'] = {}
+                    meta['LIST']['INDICES'] = nse.fetchIndices()['list']
+                    for indice in meta['LIST']['INDICES']:
+                        try:
+                            meta['LIST'][indice] = nse.fetchIndexStocks(indice)['list'][1:]
+                        except:
+                            st.toast(f'Data unavailable for {indice}')
 
-                writeJSON(meta, METADATA_FILE_PATH)
-            except Exception:
-                st.toast("Update only possible on localhost")
+                    writeJSON(meta, METADATA_FILE_PATH)
+                except Exception:
+                    st.toast("Update only possible on localhost")
         
 
         if st.button("Refresh Market Status"):
@@ -123,7 +127,7 @@ if chosen_tab == "analysis":
         try:
             meta = readJSON(METADATA_FILE_PATH)
             selected_indice = st.selectbox('Select Index', meta['LIST']['INDICES'])
-            submitted = st.form_submit_button("Fetch Live Data")
+            submitted = st.form_submit_button("Analyze")
             if submitted:
                 st.session_state['analysis'] = {}
                 if selected_indice in meta['LIST']:

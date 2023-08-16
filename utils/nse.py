@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import streamlit as st
 
+from datetime import datetime
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
@@ -64,3 +65,18 @@ class NSE:
 			}
 
 		return { 'raw': jsonData, 'list': tickerList, 'data': tickerData}
+
+
+	def fetchHolidayList(self):
+		params = {'type': 'trading'}
+		jsonData = self.session.get(url="https://www.nseindia.com/api/holiday-master", params=params).json()
+		
+		holiday_list = []
+		for obj in jsonData['FO']:
+			holiday_list.append(obj['tradingDate'])
+
+		holiday_date_list = []
+		for datestr in holiday_list:
+			holiday_date_list.append(datetime.strptime(datestr, '%d-%b-%Y').date())
+
+		return holiday_date_list
