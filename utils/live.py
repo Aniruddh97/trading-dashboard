@@ -14,9 +14,9 @@ def get_live_data(ticker, period='1d', interval='1d'):
     data.insert(loc=0, column='index', value=list(range(0,len(data.index))))
     data['Date'] = pd.to_datetime(data.Date).dt.date
     data = data.set_index('index').reset_index().drop(['index'], axis=1)
-    # if 'Adj Close' in data:
-    #     data = data.drop(['Close'], axis=1)
-    #     data.rename(columns={'Adj Close': 'Close'}, inplace=True)
+    if 'Adj Close' in data:
+        data = data.drop(['Close'], axis=1)
+        data.rename(columns={'Adj Close': 'Close'}, inplace=True)
     data.rename(columns={'Date': 'DATE', 'Open': 'OPEN', 'High': 'HIGH','Low': 'LOW', 'Close': 'CLOSE', 'Volume': 'VOLUME'}, inplace=True)
     
     data.OPEN = data.OPEN.round(2)
