@@ -42,8 +42,8 @@ def reconcile_data(df_dict, period):
         db_df = df_dict[ticker]
         new_df = get_live_data(ticker=ticker, period=period)
 
+        append_list = []
         for _, row in new_df.iterrows():
-            append_list = []
             index_list = db_df.index[db_df.DATE == row.DATE].tolist()
             
             if len(index_list) == 1:
