@@ -22,21 +22,21 @@ def get_live_data(ticker, period='1d', interval='1d'):
     data.OPEN = data.OPEN.round(2)
     data.HIGH = data.HIGH.round(2)
     data.LOW = data.LOW.round(2)
-    data.CLOSE = data.OPEN.round(2)
+    data.CLOSE = data.CLOSE.round(2)
     
     data = data[['DATE', 'OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
 
-    if period == '1d' and interval == '1d' and not data.empty:
-        first = data.head(1)
-        last = get_live_data(ticker=ticker, period=period, interval='1m').tail(1)
-        return pd.DataFrame([{
-            'DATE': first.DATE[first.index.stop-1],
-            'OPEN': first.OPEN[first.index.stop-1],
-            'HIGH': first.HIGH[first.index.stop-1],
-            'LOW': first.LOW[first.index.stop-1],
-            'CLOSE': last.CLOSE[last.index.stop-1],
-            'VOLUME': first.VOLUME[first.index.stop-1],
-        }])
+    # if period == '1d' and interval == '1d' and not data.empty:
+    #     first = data.head(1)
+    #     last = get_live_data(ticker=ticker, period=period, interval='1m').tail(1)
+    #     return pd.DataFrame([{
+    #         'DATE': first.DATE[first.index.stop-1],
+    #         'OPEN': first.OPEN[first.index.stop-1],
+    #         'HIGH': first.HIGH[first.index.stop-1],
+    #         'LOW': first.LOW[first.index.stop-1],
+    #         'CLOSE': last.CLOSE[last.index.stop-1],
+    #         'VOLUME': first.VOLUME[first.index.stop-1],
+    #     }])
     return data
 
 
