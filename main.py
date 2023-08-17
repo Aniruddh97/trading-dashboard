@@ -150,15 +150,15 @@ if chosen_tab == "analysis":
                         pbar.progress(int((i)*(100/len(tickers))), text=f"Analyzing {ticker}")
 
                         df = ohlcLiveData[ticker]
-                        df = recognizePattern(df, all=False)
-                        sri = SupportResistanceIndicator(df, 11, 5, ticker)
+                        pattern, rank = getLatestCandlePattern(df, all=True)
+                        sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=ticker, patternTitle=pattern)
 
                         candleIndex = df.index.stop-1
                         analysis['data'][ticker] = sri.getIndicator(candleIndex)
                         analysis['rank'].append({
                             'Ticker': ticker,
-                            'Pattern': df['candlestick_pattern'][candleIndex],
-                            'Pattern Rank': df['candlestick_rank'][candleIndex],
+                            'Pattern': pattern,
+                            'Pattern Rank': rank
                         })
 
                     pbar.progress(100, text=f"Analysis complete")
@@ -176,7 +176,7 @@ if chosen_tab == "analysis":
             st.dataframe(rank_for_display)
 
         indicator_obj = st.session_state['analysis']['data']
-        for ticker in rank.Ticker.to_list():
+        for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
             st.plotly_chart(indicator_obj[ticker])
 
 
@@ -208,24 +208,30 @@ if chosen_tab == "watchlist":
     watchlist = meta['watchlist']
     if len(watchlist) > 0:
         if 'watchlist' in st.session_state and len(st.session_state['watchlist']) != 0 and st.session_state['status'] != 1:
-            for chart in st.session_state['watchlist']:
-                st.plotly_chart(chart)
+            pass
         else:
             st.session_state['watchlist'] = []
             
             live_data = {}
-            if st.session_state['status'] == 1:
+            page = 0
+            if 'page' in st.session_state:
+                page = st.session_state.page
+            if st.session_state['status'] == 1 and page == 0:
                 live_data = get_live_data_collection(tickers=watchlist)
+
+
             ohlc_obj_df = load_db_data(watchlist)
             ohlc_obj_df = append_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)
             
             for ticker in ohlc_obj_df:
                 df = ohlc_obj_df[ticker]
-                df = recognizePattern(df, all=True)
-                sri = SupportResistanceIndicator(df, 11, 5, ticker)
+                pattern, rank = getLatestCandlePattern(df=df, all=True)
+                sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=ticker, patternTitle=pattern)
                 chart = sri.getIndicator(df.index.stop-1)
-                st.plotly_chart(chart)
                 st.session_state['watchlist'].append(chart)
+            
+        for chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=5):
+            st.plotly_chart(chart)
             
     else:
         st.info('Watchlist is empty')

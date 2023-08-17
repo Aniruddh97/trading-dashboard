@@ -1,7 +1,7 @@
 import os
 import json
 
-from utils import METADATA_FILE_PATH
+from .constants import *
 
 def writeJSON(obj, file_path=METADATA_FILE_PATH):
 	with open(file_path, 'w+') as outfile:

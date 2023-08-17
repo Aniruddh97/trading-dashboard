@@ -6,11 +6,12 @@ from plotly.subplots import make_subplots
 
 class SupportResistanceIndicator:
 
-    def __init__(self, data, window, backCandles, tickerName=''):
+    def __init__(self, data, window, backCandles, tickerName='', patternTitle=''):
         self.window = window
         self.backCandles = backCandles
         self.df = data
         self.tickerName = tickerName
+        self.patternTitle = patternTitle
         self.RRR = 1.5
         # self.df['RSI'] = ta.rsi(data.CLOSE, length=14)
         # self.df["EMA14"] = ta.ema(data.CLOSE, length=14)
@@ -92,7 +93,7 @@ class SupportResistanceIndicator:
             start = 0
         dfSlice = self.df[start:candleIndex+1]
 
-        patternTitle = ""
+        patternTitle = self.patternTitle
         if 'candlestick_pattern' in dfSlice:
             patternTitle = dfSlice['candlestick_pattern'][dfSlice.index.stop-1][3:].lower()
             

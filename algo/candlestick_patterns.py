@@ -1,11 +1,25 @@
 import talib
 import numpy as np
+import streamlit as st
+
 from itertools import compress
+
 
 def getCandlePatternList(all=False):
     if not all:
         return ['CDLEVENINGDOJISTAR', 'CDLEVENINGSTAR', 'CDLMORNINGDOJISTAR', 'CDLMORNINGSTAR']
     return talib.get_function_groups()['Pattern Recognition']
+
+
+def getLatestCandlePattern(df, all=False):
+    
+    df = df.tail(15).copy(deep=True)
+    df = df.reset_index(drop=True)
+    df = recognizePattern(df, all)
+    pattern = df['candlestick_pattern'][df.index.stop-1]
+    rank = candle_rankings[pattern]
+    
+    return pattern, rank
 
 
 def recognizePattern(df, all=False):
@@ -84,6 +98,7 @@ def recognizePattern(df, all=False):
     return df
 
 candle_rankings = {
+		"NO_PATTERN": 99999,
         "CDL3LINESTRIKE_Bull": 1,
         "CDL3LINESTRIKE_Bear": 2,
         "CDL3BLACKCROWS_Bull": 3,
