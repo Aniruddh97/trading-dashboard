@@ -78,14 +78,18 @@ with st.sidebar:
 
 
     with st.expander("Other Operations"):
-
+        
         if st.button("Clear CSV files"):
-            # remove csv files
             dir_name = DATA_DIR_PATH
             directoryItems = os.listdir(dir_name)
             for item in directoryItems:
                 if item.endswith(".csv"):
                     os.remove(os.path.join(dir_name, item))
+
+        if st.button("Clear Watchlist"):
+            meta = readJSON()
+            meta['watchlist'] = []
+            writeJSON(meta)
 
         if st.button("Update Metadata"):
             with st.spinner('Updating...'):
@@ -111,6 +115,7 @@ with st.sidebar:
 
         if st.button("Refresh Market Status"):
             st.session_state['status'] = is_market_open()
+            
 
         
 chosen_tab = stx.tab_bar(data=[
