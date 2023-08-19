@@ -10,12 +10,7 @@ from utils import *
 
 with st.sidebar:
     
-    if 'status' not in st.session_state:
-        market_status = is_market_open()
-        st.session_state['status'] = market_status
-    else:
-        market_status= st.session_state['status']
-    
+    market_status = is_market_open()
     if market_status == -1:
         st.error('Market is Closed')
     elif market_status == 0:
@@ -113,11 +108,6 @@ with st.sidebar:
                     st.toast("Update only possible on localhost")
         
 
-        if st.button("Refresh Market Status"):
-            st.session_state['status'] = is_market_open()
-            
-
-        
 chosen_tab = stx.tab_bar(data=[
     stx.TabBarItemData(id="analysis", title="Analysis", description=""),
     stx.TabBarItemData(id="watchlist", title="Watchlist", description=""),
@@ -139,7 +129,7 @@ if chosen_tab == "analysis":
                     tickers = meta['LIST'][selected_indice]
                     
                     live_data = {}
-                    if st.session_state['status'] == 1:
+                    if is_market_open() == 1:
                         live_data = get_live_data_collection(tickers=tickers)
 
                     ohlcData = load_db_data(tickers=tickers)
@@ -181,8 +171,10 @@ if chosen_tab == "analysis":
             st.dataframe(rank_for_display)
 
         indicator_obj = st.session_state['analysis']['data']
+
+        chartContainer = st.container()
         for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
-            st.plotly_chart(indicator_obj[ticker])
+            chartContainer.plotly_chart(indicator_obj[ticker])
 
 
 if chosen_tab == "watchlist":
@@ -212,7 +204,7 @@ if chosen_tab == "watchlist":
 
     watchlist = meta['watchlist']
     if len(watchlist) > 0:
-        if 'watchlist' in st.session_state and len(st.session_state['watchlist']) != 0 and st.session_state['status'] != 1:
+        if 'watchlist' in st.session_state and len(st.session_state['watchlist']) != 0 and is_market_open() != 1:
             pass
         else:
             st.session_state['watchlist'] = []
@@ -221,7 +213,7 @@ if chosen_tab == "watchlist":
             page = 0
             if 'page' in st.session_state:
                 page = st.session_state.page
-            if st.session_state['status'] == 1 and page == 0:
+            if is_market_open() == 1 and page == 0:
                 live_data = get_live_data_collection(tickers=watchlist)
 
 
@@ -235,8 +227,9 @@ if chosen_tab == "watchlist":
                 chart = sri.getIndicator(df.index.stop-1)
                 st.session_state['watchlist'].append(chart)
             
+        chartContainer = st.container()
         for chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=5):
-            st.plotly_chart(chart)
+            chartContainer.plotly_chart(chart)
             
     else:
         st.info('Watchlist is empty')

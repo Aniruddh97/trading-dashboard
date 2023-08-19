@@ -78,14 +78,12 @@ def is_market_open():
                     st.write(hdate)
                     return -1
 
-        market_json = requests.get("https://www.isthemarketopen.com/static/markets.json").json()
-        nse = [market for market in market_json if market['id'] == 'NSE' and market['country'] == 'India']
-        if len(nse) == 0:
+        date_today = datetime.datetime.today()
+        if date_today.weekday() == 5 or date_today.weekday() == 6:
             return -1
-        
-        nse = nse[0]
-        now_time = datetime.datetime.now(tz=ZoneInfo(nse['tz'])).strftime("%H:%M")
-        if now_time < nse['close'] and now_time >= nse['open']:
+
+        now_time = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).strftime("%H:%M")
+        if now_time < '15:30' and now_time >= '9:15':
             return 1
 
     except Exception as e:
