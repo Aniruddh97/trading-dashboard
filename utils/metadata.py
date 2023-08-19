@@ -1,5 +1,6 @@
 import os
 import json
+import streamlit as st
 
 from .constants import *
 
@@ -13,3 +14,20 @@ def readJSON(file_path=METADATA_FILE_PATH):
 		with open(file_path) as json_file:
 			return json.load(json_file)
 	return {}
+
+
+def addToWatchlist(ticker, file_path=METADATA_FILE_PATH):
+	meta = readJSON()
+	if 'watchlist' in meta:
+		meta['watchlist'].append(ticker)
+		writeJSON(meta)
+		st.session_state['watchlist'] = []
+		st.toast(f'Added `{ticker}` to watchlist')
+
+
+def removeFromWatchlist(ticker, file_path=METADATA_FILE_PATH):
+	meta = readJSON()
+	if 'watchlist' in meta:
+		meta['watchlist'].remove(ticker)
+		writeJSON(meta)
+		st.session_state['watchlist'] = []

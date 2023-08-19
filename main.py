@@ -175,7 +175,9 @@ if chosen_tab == "analysis":
         chartContainer = st.container()
         for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
             chartContainer.plotly_chart(indicator_obj[ticker])
-
+            if chartContainer.button(f'Add `{ticker}` to watchlist'):
+                addToWatchlist(ticker=ticker)
+ 
 
 if chosen_tab == "watchlist":
     meta = readJSON()
@@ -190,17 +192,13 @@ if chosen_tab == "watchlist":
         ticker = st.selectbox('Search', tickerList)
         submitted = st.form_submit_button("Add to watchlist")
         if submitted:
-            meta['watchlist'].append(ticker)
-            writeJSON(meta)
-            st.session_state['watchlist'] = []
+            addToWatchlist(ticker=ticker)
 
     with st.form('Remove to watchlist'):
         ticker = st.selectbox('Search', meta['watchlist'])
         submitted = st.form_submit_button("Remove from watchlist")
         if submitted:
-            meta['watchlist'].remove(ticker)
-            writeJSON(meta)
-            st.session_state['watchlist'] = []
+            removeFromWatchlist(ticker=ticker)
 
     watchlist = meta['watchlist']
     if len(watchlist) > 0:
