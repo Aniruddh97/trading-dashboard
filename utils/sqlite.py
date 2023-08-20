@@ -299,3 +299,49 @@ def execute_query(database_path, query):
         conn.commit()
         conn.close()
     return df
+
+
+def update_query(database_path, query, data):
+    try :
+        conn = sqlite3.connect(database_path)
+        conn.execute(query, data)
+    except sqlite3.OperationalError:
+        st.toast(f"No such table: {query} for {database_path}")
+    except:
+        st.toast(f"Error: {query} for {database_path}")
+    finally:
+        conn.commit()
+        conn.close()
+
+
+def save_order(ticker, start_date, strike_price, target, stoploss, units):
+    rrr = abs(target - strike_price)/abs(stoploss - strike_price)
+    position = 'LONG' if target > strike_price else 'SHORT'
+
+    order = pd.DataFrame([{
+        'ticker': ticker,
+        'start_date': start_date,
+        'end_date': None,
+        'position': position,
+        'result': None,
+        'target': target,
+        'strike_price': strike_price,
+        'stoploss': stoploss,
+        'units': int(units),
+        'rrr': rrr,
+    }])
+
+    conn = sqlite3.connect(ORDER_DATABASE_PATH)
+    if does_exist("orders", ORDER_DATABASE_PATH):
+        query = """
+            SELECT * FROM orders;
+        """
+        orders_df = execute_query(database_path=ORDER_DATABASE_PATH, query=query)
+        orders_df = pd.concat([orders_df, order], ignore_index=True)
+        
+        orders_df.to_sql(name='orders', con=conn, if_exists='replace', index=False)
+    else:
+        order.to_sql(name='orders', con=conn, if_exists='replace', index=False)
+
+    conn.commit()
+    conn.close()

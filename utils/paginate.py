@@ -6,7 +6,7 @@ def paginate(datalist, limit_per_page):
     if 'page' not in st.session_state:
         st.session_state.page = 0
 
-    cols = st.columns(5)
+    cols = st.columns(3)
     last_page = math.ceil((len(datalist) / limit_per_page)) - 1
 
     if cols[2].button(":point_right:"):
