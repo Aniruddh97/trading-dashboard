@@ -9,7 +9,6 @@ from .paginate import *
 def evaluate_trade(data, date, strike_price, target, stop_loss):
     end = data.index.stop - 1
     start = data.index[data['DATE'] == pd.to_datetime(date).date()].tolist()[0] + 1
-    st.write(start, end)
     if start >= end:
         return 0, 0
 

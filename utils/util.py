@@ -75,7 +75,6 @@ def is_market_open():
             for holiday in holidays:
                 hdate = datetime.datetime.strptime(holiday, DATE_FORMAT).date()
                 if hdate == datetime.date.today():
-                    st.write(hdate)
                     return -1
 
         date_today = datetime.datetime.today()
