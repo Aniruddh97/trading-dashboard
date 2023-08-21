@@ -82,7 +82,7 @@ def is_market_open():
             return -1
 
         now_time = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).strftime("%H:%M")
-        if now_time < '15:30' and now_time >= '9:15':
+        if now_time < '15:30' and now_time >= '09:15':
             return 1
 
     except Exception as e:
