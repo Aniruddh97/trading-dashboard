@@ -160,7 +160,7 @@ with files:
     st.divider()
     uploaded_file = st.file_uploader("Upload App Snapshot")
     if uploaded_file is not None:
-        with ZipFile('app.zip', 'r') as zip_ref:
+        with ZipFile(uploaded_file, 'r') as zip_ref:
             zip_ref.extractall(DATA_DIR_PATH)
             
     st.divider()
