@@ -303,8 +303,8 @@ if chosen_tab == "paper":
     st.plotly_chart(sri.getIndicator(df.index.stop-1))
 
     with st.form("Order Form"):
-        stop_loss = st.number_input("Stoploss")
-        target = st.number_input("Target")
+        stop_loss = st.number_input("Stoploss", 0)
+        target = st.number_input("Target", 0)
         units = st.number_input("Units", 1)
         submitted = st.form_submit_button("Place Order")
         if submitted:
