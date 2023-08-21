@@ -62,7 +62,7 @@ def reconcile_data(df_dict, period):
         if len(append_list) > 0:
             db_df = pd.concat([db_df, pd.DataFrame(append_list)], ignore_index=True)
 
-        replace_table(table=ticker, df=db_df)
+        replace_olhc_table(table=ticker, df=db_df)
 
     pbar.progress(100, text=f"Reconciliation complete")
 

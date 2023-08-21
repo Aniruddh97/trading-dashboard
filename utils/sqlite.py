@@ -234,37 +234,34 @@ def load_db_data(tickers):
     return ohlcData
 
 
-def replace_table(table, df):
+def replace_olhc_table(table, df):
+    if df.empty:
+        return
+    
+    if does_exist(table=table, db_path=STOCK_DATABASE_PATH):
+        replace_table(table=table, df=df, db_path=STOCK_DATABASE_PATH)
+    elif does_exist(table=table, db_path=INDICE_DATABASE_PATH):
+        replace_table(table=table, df=df, db_path=INDICE_DATABASE_PATH)
+    else:
+        st.toast(f'{table} does not exist')
+
+
+def replace_table(table, df, db_path):
     if df.empty:
         return
     
     query = f'''
         DROP TABLE IF EXISTS `{table}`
     '''
+    conn = sqlite3.connect(db_path)
+    try:
+        df.to_sql(name=table, con=conn, if_exists='replace', index=False)
+    except:
+        execute_query(database_path=db_path, query=query)
+        df.to_sql(name=table, con=conn, if_exists='replace', index=False)
 
-    if does_exist(table=table, db_path=STOCK_DATABASE_PATH):
-        conn = sqlite3.connect(STOCK_DATABASE_PATH)
-        try:
-            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
-        except:
-            execute_query(database_path=STOCK_DATABASE_PATH, query=query)
-            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
-
-        conn.commit()
-        conn.close()
-
-    elif does_exist(table=table, db_path=INDICE_DATABASE_PATH):
-        conn = sqlite3.connect(INDICE_DATABASE_PATH)
-        try:
-            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
-        except:
-            execute_query(database_path=INDICE_DATABASE_PATH, query=query)
-            df.to_sql(name=table, con=conn, if_exists='replace', index=False)
-            
-        conn.commit()
-        conn.close()
-    else:
-        st.toast(f'{table} does not exist')
+    conn.commit()
+    conn.close()
 
 
 def does_exist(table, db_path):
