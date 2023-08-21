@@ -13,8 +13,8 @@ sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=s
 st.plotly_chart(sri.getIndicator(df.index.stop-1))
 
 with st.form("Order Form"):
-	stop_loss = st.number_input("Stoploss", 0)
-	target = st.number_input("Target", 0)
+	stop_loss = st.number_input("Stoploss")
+	target = st.number_input("Target")
 	units = st.number_input("Units", 1)
 	submitted = st.form_submit_button("Place Order")
 	if submitted:

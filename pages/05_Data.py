@@ -158,7 +158,7 @@ with files:
             os.remove('app.zip')
 
     st.divider()
-    uploaded_file = st.file_uploader("Upload App Snapshot", type="zip")
+    uploaded_file = st.file_uploader("Upload App Snapshot")
     if uploaded_file is not None:
         with ZipFile('app.zip', 'r') as zip_ref:
             zip_ref.extractall(DATA_DIR_PATH)
