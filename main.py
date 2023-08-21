@@ -232,7 +232,7 @@ if chosen_tab == "watchlist":
                 st.session_state['watchlist'].append(chart)
             
         chartContainer = st.container()
-        for chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=5):
+        for chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=10):
             chartContainer.plotly_chart(chart)
             
     else:

@@ -18,16 +18,24 @@ def readJSON(file_path=METADATA_FILE_PATH):
 
 def addToWatchlist(ticker, file_path=METADATA_FILE_PATH):
 	meta = readJSON()
-	if 'watchlist' in meta:
-		meta['watchlist'].append(ticker)
-		writeJSON(meta)
-		st.session_state['watchlist'] = []
-		st.toast(f'Added `{ticker}` to watchlist')
+	if 'watchlist' not in meta:
+		return
+	
+	if ticker in meta['watchlist']:
+		st.toast(f'`{ticker}` already in watchlist')
+		return
+	
+	meta['watchlist'].append(ticker)
+	writeJSON(meta)
+	st.session_state['watchlist'] = []
+	st.toast(f'Added `{ticker}` to watchlist')
 
 
 def removeFromWatchlist(ticker, file_path=METADATA_FILE_PATH):
 	meta = readJSON()
-	if 'watchlist' in meta:
-		meta['watchlist'].remove(ticker)
-		writeJSON(meta)
-		st.session_state['watchlist'] = []
+	if 'watchlist' not in meta:
+		return
+	
+	meta['watchlist'].remove(ticker)
+	writeJSON(meta)
+	st.session_state['watchlist'] = []
