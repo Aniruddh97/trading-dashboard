@@ -112,6 +112,12 @@ with database:
         if st.button("Delete Orders"):
             if os.path.isfile(ORDER_DATABASE_PATH):
                 os.remove(ORDER_DATABASE_PATH)
+        
+        if st.button("Delete Backup"):
+            if os.path.isfile(STOCK_DATABASE_BACKUP_PATH):
+                os.remove(STOCK_DATABASE_BACKUP_PATH)
+            if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):
+                os.remove(INDICE_DATABASE_BACKUP_PATH)
 
         if st.button("Clear Watchlist"):
             meta = readJSON()
