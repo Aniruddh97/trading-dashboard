@@ -30,6 +30,7 @@ def evaluate_trade(data, date, strike_price, target, stop_loss):
 
         result_index = i
         if result != 0:
+            result = float(result)
             break
     
     return result, result_index
@@ -75,7 +76,7 @@ def display_pnl():
 
     last_pnl = ''
     if not closed_positions_df.empty:
-        last_pnl = round(float(closed_positions_df.result[orders_df.index.stop-1]), 2)
+        last_pnl = round(float(closed_positions_df.result[closed_positions_df.index.to_list()[-1]]), 2)
 
     col1, col2 = st.columns(2)
     col1.metric("P&L", str(pnl), str(last_pnl))
