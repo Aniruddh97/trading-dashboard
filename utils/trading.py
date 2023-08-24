@@ -54,8 +54,7 @@ def process_open_trades():
             stop_loss=row.stoploss)
         
         if result != 0:
-            result *= result * row.units
-
+            result *= row.units
             query = """
                 UPDATE orders SET result = ?, end_date = ? WHERE ticker = ? and target = ?
             """
