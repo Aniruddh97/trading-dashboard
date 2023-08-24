@@ -15,7 +15,7 @@ with sql:
     with form:
         defaultQuery = "SELECT * FROM `TCS`"
         query = st.text_input("SQL Query", defaultQuery)
-        option = st.radio("Select Database", ('stock', 'index'))
+        option = st.radio("Select Database", ('stock', 'index', 'orders'))
         submitted = st.form_submit_button("Display")
         if submitted:
             blacklisted = ['drop', 'alter', 'create', 'truncate', 'insert', 'delete', 'update']
@@ -27,9 +27,11 @@ with sql:
                     break
                 
             if proceed:
-                db = INDICE_DATABASE_PATH
-                if option == 'stock':
-                    db = STOCK_DATABASE_PATH
+                db = STOCK_DATABASE_PATH
+                if option == 'index':
+                    db = INDICE_DATABASE_PATH
+                elif option == 'orders':
+                    db = ORDER_DATABASE_PATH
                 df = execute_query(db, query)
                 container.dataframe(df)
                 fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
