@@ -72,7 +72,7 @@ def display_pnl():
     st.session_state.pnl = []
     rrr = orders_df.rrr.mean()
     closed_positions_df = orders_df[orders_df.result.notnull()]
-    pnl = round(float(closed_positions_df.result.sum()), 2)
+    pnl = round(closed_positions_df.result.astype(float).sum(), 2)
 
     last_pnl = ''
     if not closed_positions_df.empty:
@@ -80,7 +80,7 @@ def display_pnl():
 
     col1, col2 = st.columns(2)
     col1.metric("P&L", str(pnl), str(last_pnl))
-    col2.metric("Avg. RRR", str(round(rrr,2)), str(round(orders_df.rrr[orders_df.index.stop-1],2)))
+    col2.metric("Avg. RRR", str(round(rrr,2)), str(round(orders_df.rrr.astype(float)[orders_df.index.stop-1],2)))
 
     tickers = list(set(closed_positions_df.ticker.to_list()))
     data_dict = most_recent_data(tickers=tickers)
