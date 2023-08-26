@@ -9,7 +9,7 @@ from .paginate import *
 def evaluate_trade(data, date, strike_price, target, stop_loss):
     end = data.index.stop - 1
     start = data.index[data['DATE'] == pd.to_datetime(date).date()].tolist()[0] + 1
-    if start >= end:
+    if start > end:
         return 0, 0
 
     result = 0
@@ -80,6 +80,10 @@ def display_pnl():
     col1, col2 = st.columns(2)
     col1.metric("P&L", str(pnl), str(last_pnl))
     col2.metric("Avg. RRR", str(round(rrr,2)), str(round(orders_df.rrr.astype(float)[orders_df.index.stop-1],2)))
+
+    # Diplay open positions
+    st.divider()
+    st.dataframe(orders_df[orders_df.result.isnull()])
 
     tickers = list(set(closed_positions_df.ticker.to_list()))
     data_dict = most_recent_data(tickers=tickers)

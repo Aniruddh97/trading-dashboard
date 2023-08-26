@@ -5,8 +5,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        ports:
-            - "8051:8501"
+        network_mode: host
         volumes:
             - ./:/app
-        command: bash -c "streamlit run main.py"
+        command: bash -c "streamlit run main.py --browser.serverAddress localhost"
