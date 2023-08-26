@@ -92,10 +92,10 @@ def is_market_open():
     return -1
 
 
-def most_recent_data(tickers):
+def most_recent_data(tickers, progress=True):
     live_data = {}
     if is_market_open() == 1:
-        live_data = get_live_data_collection(tickers=tickers)
+        live_data = get_live_data_collection(tickers=tickers, progress=progress)
 
     ohlc_obj_df = load_db_data(tickers=tickers)
     ohlc_obj_df = append_data(ohlc_obj_df=ohlc_obj_df, data_obj_df=live_data)

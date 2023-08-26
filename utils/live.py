@@ -40,17 +40,26 @@ def get_live_data(ticker, period='1d', interval='1d'):
     return data
 
 
-def get_live_data_collection(tickers, period='1d'):
+def get_live_data_collection(tickers, period='1d', progress=True):
     i=0
     live_collection = {}
-    pbar = st.progress(0, text=f"Fetching live data")
+    
+    pbar = None
+    if progress:
+        pbar = st.progress(0, text=f"Fetching live data")
+
     for ticker in tickers:
         i += 1
         try:
-            pbar.progress(int((i)*(100/len(tickers))), text=f"Loading live data : {ticker}")
+            if progress:
+                pbar.progress(int((i)*(100/len(tickers))), text=f"Loading live data : {ticker}")
+            
             live_collection[ticker] = get_live_data(ticker=ticker, period=period)
         except:
              st.toast(f'Live data unavailable for {ticker}')
              continue
-    pbar.progress(100, text="Live data load completed")
+    
+    if progress:
+        pbar.progress(100, text="Live data load completed")
+        
     return live_collection

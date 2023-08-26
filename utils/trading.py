@@ -16,7 +16,7 @@ def evaluate_trade(data, date, strike_price, target, stop_loss):
     result_index = start
     position = 'LONG' if target > strike_price else 'SHORT'
 
-    for i in range(start, end):
+    for i in range(start, end+1):
         if position == 'LONG':
             if data.LOW[i] <= stop_loss:
                 result = stop_loss - strike_price
@@ -30,7 +30,7 @@ def evaluate_trade(data, date, strike_price, target, stop_loss):
 
         result_index = i
         if result != 0:
-            result = float(result)
+            result = round(float(result),2)
             break
     
     return result, result_index
@@ -42,7 +42,7 @@ def process_open_trades():
         return
     
     tickers = open_position_df.ticker.to_list()
-    data_dict = most_recent_data(tickers=tickers)
+    data_dict = most_recent_data(tickers=tickers, progress=False)
 
     for index, row in open_position_df.iterrows():
         data = data_dict[row.ticker]
@@ -82,11 +82,13 @@ def display_pnl():
     col2.metric("Avg. RRR", str(round(rrr,2)), str(round(orders_df.rrr.astype(float)[orders_df.index.stop-1],2)))
 
     # Diplay open positions
-    st.divider()
-    st.dataframe(orders_df[orders_df.result.isnull()])
+    open_positions = orders_df[orders_df.result.isnull()]
+    if not open_positions.empty:
+        st.divider(open_positions)
+        st.dataframe()
 
     tickers = list(set(closed_positions_df.ticker.to_list()))
-    data_dict = most_recent_data(tickers=tickers)
+    data_dict = most_recent_data(tickers=tickers, progress=False)
 
     for index, row in closed_positions_df.iterrows():
         df = data_dict[row.ticker]
