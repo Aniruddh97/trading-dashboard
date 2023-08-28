@@ -179,8 +179,9 @@ with files:
         with ZipFile('app.zip', 'w') as zipObj:
             directoryItems = os.listdir(DATA_DIR_PATH)
             for item in directoryItems:
-                file_path = os.path.join(DATA_DIR_PATH, item)
-                zipObj.write(file_path, os.path.basename(file_path))
+                if item in ['metadata.json', 'order.sqlit']:
+                    file_path = os.path.join(DATA_DIR_PATH, item)
+                    zipObj.write(file_path, os.path.basename(file_path))
 
         with open("app.zip", "rb") as fp:
             st.download_button(
