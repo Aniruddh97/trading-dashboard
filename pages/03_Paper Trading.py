@@ -4,8 +4,7 @@ from utils import *
 
 
 meta = readJSON(METADATA_FILE_PATH)
-ticker_list = list(set([ticker for indice in meta['LIST'] for ticker in meta['LIST'][indice]]))
-selected_ticker = st.selectbox('Search', ticker_list)
+selected_ticker = st.selectbox('Search', meta['LIST']['NIFTY 500'])
 df = most_recent_data(tickers=[selected_ticker])[selected_ticker]
 
 pattern, rank = getLatestCandlePattern(df=df, all=True)

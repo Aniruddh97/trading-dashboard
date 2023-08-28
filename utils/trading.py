@@ -87,6 +87,7 @@ def display_pnl():
         st.divider()
         st.dataframe(open_positions)
 
+    closed_positions_df = closed_positions_df.iloc[::-1]
     tickers = list(set(closed_positions_df.ticker.to_list()))
     data_dict = most_recent_data(tickers=tickers, progress=False)
 
