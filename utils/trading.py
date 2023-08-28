@@ -84,8 +84,8 @@ def display_pnl():
     # Diplay open positions
     open_positions = orders_df[orders_df.result.isnull()]
     if not open_positions.empty:
-        st.divider(open_positions)
-        st.dataframe()
+        st.divider()
+        st.dataframe(open_positions)
 
     tickers = list(set(closed_positions_df.ticker.to_list()))
     data_dict = most_recent_data(tickers=tickers, progress=False)
