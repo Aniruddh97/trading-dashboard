@@ -179,7 +179,7 @@ with files:
         with ZipFile('app.zip', 'w') as zipObj:
             directoryItems = os.listdir(DATA_DIR_PATH)
             for item in directoryItems:
-                if item in ['metadata.json', 'order.sqlit']:
+                if item in ['metadata.json', 'order.sqlite']:
                     file_path = os.path.join(DATA_DIR_PATH, item)
                     zipObj.write(file_path, os.path.basename(file_path))
 
