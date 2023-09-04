@@ -23,6 +23,8 @@ def append_data(ohlc_obj_df, data_obj_df):
                 recent_live_date = row['DATE']
                 if  recent_live_date > recent_db_date:
                     ohlc_obj_df[stock] = pd.concat([ohlc_obj_df[stock], pd.DataFrame([row])], ignore_index=True)
+                elif recent_live_date == recent_db_date:
+                    ohlc_obj_df[stock].loc[recent_db_date, ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']] = [row.OPEN, row.HIGH, row.LOW, row.CLOSE, row.VOLUME]
             latestData[stock] = ohlc_obj_df[stock]
         except:
             latestData[stock] = ohlc_obj_df[stock]
