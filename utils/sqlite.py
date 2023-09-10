@@ -19,7 +19,7 @@ def create_stock_database(start_date, end_date, database_path=STOCK_DATABASE_PAT
     stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
     
     i = 0
-    my_bar = st.sidebar.progress(0, text="Populating database")
+    my_bar = st.progress(0, text="Populating database")
     for stock in stockData:
         i += 1
         df = pd.DataFrame(stockData[stock])
@@ -38,7 +38,7 @@ def create_indice_database(start_date, end_date, database_path=INDICE_DATABASE_P
     indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
    
     i = 0
-    my_bar = st.sidebar.progress(0, text="Populating indice database")
+    my_bar = st.progress(0, text="Populating indice database")
     for index in indiceData:
         i += 1
         df = pd.DataFrame(indiceData[index])
@@ -53,7 +53,7 @@ def bhavcopy_stock_range(start_date, end_date):
     i = 0
     stockData = {}
     size = int((end_date - start_date).days)+1
-    my_bar = st.sidebar.progress(0, text="Downloading stock data")
+    my_bar = st.progress(0, text="Downloading stock data")
     
     meta = readJSON(METADATA_FILE_PATH)
     tickerList = []
@@ -103,7 +103,7 @@ def bhavcopy_index_range(start_date, end_date):
     i = 0
     indiceData = {}
     size = int((end_date - start_date).days)+1
-    my_bar = st.sidebar.progress(0, text="Downloading index data")
+    my_bar = st.progress(0, text="Downloading index data")
 
     for current_date in getDateRange(start_date, end_date):
         i += 1
@@ -156,7 +156,7 @@ def update_db_data(start_date, end_date):
 
     i = 0
     conn = sqlite3.connect(STOCK_DATABASE_PATH)
-    my_bar = st.sidebar.progress(0, text="Populating stock database")
+    my_bar = st.progress(0, text="Populating stock database")
     for stock in stockData:
         read_query = f'''
             SELECT * FROM `{stock}` ORDER BY `DATE` DESC LIMIT 1
@@ -182,7 +182,7 @@ def update_db_data(start_date, end_date):
 
     i = 0
     conn = sqlite3.connect(INDICE_DATABASE_PATH)
-    my_bar = st.sidebar.progress(0, text="Populating index database")
+    my_bar = st.progress(0, text="Populating index database")
     for indice in indiceData:
         read_query = f'''
             SELECT * FROM `{indice}` ORDER BY `DATE` DESC LIMIT 1
