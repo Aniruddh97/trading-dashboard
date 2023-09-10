@@ -8,7 +8,7 @@ selected_ticker = st.selectbox('Search', meta['LIST']['NIFTY 500'])
 df = most_recent_data(tickers=[selected_ticker])[selected_ticker]
 
 pattern, rank = getLatestCandlePattern(df=df, all=True)
-sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=selected_ticker, patternTitle=pattern)
+sri = SupportResistanceIndicator(data=df, tickerName=selected_ticker, patternTitle=pattern)
 st.plotly_chart(sri.getIndicator(df.index.stop-1))
 
 with st.form("Order Form"):

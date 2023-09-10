@@ -93,7 +93,7 @@ def display_pnl():
 
     for index, row in closed_positions_df.iterrows():
         df = data_dict[row.ticker]
-        sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=row.ticker)
+        sri = SupportResistanceIndicator(data=df, tickerName=row.ticker)
         
         marker_start_x = df.index[df['DATE'] == pd.to_datetime(row.start_date).date()].tolist()[0]
         marker_start_y = df.LOW[marker_start_x] - (df.LOW[marker_start_x]/100)

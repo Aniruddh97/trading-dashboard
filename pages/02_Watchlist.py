@@ -41,7 +41,7 @@ if len(watchlist) > 0:
         for ticker in ohlc_obj_df:
             df = ohlc_obj_df[ticker]
             pattern, rank = getLatestCandlePattern(df=df, all=True)
-            sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=ticker, patternTitle=pattern)
+            sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
             chart = sri.getIndicator(df.index.stop-1)
             st.session_state['watchlist'].append((ticker,chart))
         

@@ -12,13 +12,7 @@ with st.form("Indice Selection"):
             st.session_state['analysis'] = {}
             if selected_indice in meta['LIST']:
                 tickers = meta['LIST'][selected_indice]
-                
-                live_data = {}
-                if is_market_open() == 1:
-                    live_data = get_live_data_collection(tickers=tickers)
-
-                ohlcData = load_db_data(tickers=tickers)
-                ohlcLiveData = append_data(ohlc_obj_df=ohlcData, data_obj_df=live_data)
+                ohlcLiveData = most_recent_data(tickers=tickers)
                 
                 i = 0
                 analysis = {}
@@ -31,7 +25,7 @@ with st.form("Indice Selection"):
 
                     df = ohlcLiveData[ticker]
                     pattern, rank = getLatestCandlePattern(df, all=True)
-                    sri = SupportResistanceIndicator(data=df, window=11, backCandles=5, tickerName=ticker, patternTitle=pattern)
+                    sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
 
                     candleIndex = df.index.stop-1
                     analysis['data'][ticker] = sri.getIndicator(candleIndex)

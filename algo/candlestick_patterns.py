@@ -98,7 +98,7 @@ def recognizePattern(df, all=False):
     return df
 
 candle_rankings = {
-		"NO_PATTERN": 99999,
+		"NO_PATTERN": 999,
         "CDL3LINESTRIKE_Bull": 1,
         "CDL3LINESTRIKE_Bear": 2,
         "CDL3BLACKCROWS_Bull": 3,

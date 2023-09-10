@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 
 class SupportResistanceIndicator:
 
-    def __init__(self, data, window, backCandles, tickerName='', patternTitle=''):
+    def __init__(self, data, window=31, backCandles=5, tickerName='', patternTitle=''):
         self.window = window
         self.backCandles = backCandles
         self.df = data
