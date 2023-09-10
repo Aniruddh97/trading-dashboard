@@ -5121,36 +5121,19 @@
     },
     "last_sync_date": "2023-09-04",
     "settings": {
-        "pivot_window": 31
+        "pattern_recognition": true,
+        "pivot_window": 21
     },
     "watchlist": [
-        "POWERGRID",
-        "HEROMOTOCO",
-        "BAJAJ-AUTO",
-        "TATASTEEL",
-        "ULTRACEMCO",
-        "WIPRO",
-        "JSWSTEEL",
-        "INDUSINDBK",
-        "TITAN",
-        "AXISBANK",
-        "MARUTI",
-        "ICICIBANK",
-        "COALINDIA",
-        "DRREDDY",
-        "HINDALCO",
-        "MAXHEALTH",
-        "ICICIPRULI",
-        "ATGL",
-        "TRENT",
-        "DLF",
-        "ABB",
-        "DABUR",
-        "CROMPTON",
+        "TATAPOWER",
         "TATAMOTORS",
-        "INDHOTEL",
-        "INDIGO",
-        "HCLTECH",
-        "ITC"
+        "HEROMOTOCO",
+        "RELIANCE",
+        "NAUKRI",
+        "HINDALCO",
+        "EICHERMOT",
+        "SBIN",
+        "TATASTEEL",
+        "GAIL"
     ]
 }

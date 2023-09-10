@@ -18,14 +18,18 @@ with st.form("Indice Selection"):
                 analysis = {}
                 analysis['data'] = {}
                 analysis['rank'] = []
+                patternRecognition = doPatternRecognition()
                 pbar = st.progress(0, text=f"Analyzing data")
                 for ticker in ohlcLiveData:
                     i += 1
                     pbar.progress(int((i)*(100/len(tickers))), text=f"Analyzing {ticker}")
-
+                    pattern = "NO_PATTERN"
+                    rank = 999
                     df = ohlcLiveData[ticker]
-                    pattern, rank = getLatestCandlePattern(df, all=True)
                     sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
+                    
+                    if patternRecognition:
+                        pattern, rank = getLatestCandlePattern(df, all=True)
 
                     candleIndex = df.index.stop-1
                     analysis['data'][ticker] = sri.getIndicator(candleIndex)
