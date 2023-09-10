@@ -5120,6 +5120,9 @@
         ]
     },
     "last_sync_date": "2023-09-04",
+    "settings": {
+        "pivot_window": 31
+    },
     "watchlist": [
         "POWERGRID",
         "HEROMOTOCO",

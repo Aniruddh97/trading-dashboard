@@ -2,12 +2,15 @@ import numpy as np
 import pandas as pd
 import pandas_ta as ta
 import plotly.graph_objects as go
+
+from utils import getPivotWindow
 from plotly.subplots import make_subplots
+
 
 class SupportResistanceIndicator:
 
     def __init__(self, data, window=31, backCandles=5, tickerName='', patternTitle=''):
-        self.window = window
+        self.window = getPivotWindow()
         self.backCandles = backCandles
         self.df = data
         self.tickerName = tickerName

@@ -42,3 +42,14 @@ def removeFromWatchlist(ticker, file_path=METADATA_FILE_PATH):
 	st.session_state['watchlist'] = []
 	st.toast(f'Removed `{ticker}` from watchlist')
 	st.experimental_rerun()
+
+
+def getPivotWindow():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return 11
+	
+	if 'pivot_window' not in meta['settings']:
+		return 11
+	
+	return int(meta['settings']['pivot_window'])
