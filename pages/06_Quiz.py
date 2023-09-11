@@ -34,7 +34,7 @@ if 'ticker' not in st.session_state['quiz']:
 	st.session_state['quiz']['randomIndex'] = randomIndex
 else:
 	randomTicker = st.session_state['quiz']['ticker']
-	df = most_recent_data(tickers=[randomTicker])[randomTicker]
+	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
 	randomIndex = st.session_state['quiz']['randomIndex']
 
 sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
