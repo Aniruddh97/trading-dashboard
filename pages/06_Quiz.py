@@ -28,13 +28,13 @@ tickers = meta['LIST']['NIFTY 500']
 
 if 'ticker' not in st.session_state['quiz']:
 	randomTicker = tickers[random.randint(0, len(tickers))]
-	df = most_recent_data(tickers=[randomTicker])[randomTicker]
+	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
 	randomIndex = random.randint(df.index.start+50, df.index.stop-50)
 	st.session_state['quiz']['ticker'] = randomTicker
 	st.session_state['quiz']['randomIndex'] = randomIndex
 else:
 	randomTicker = st.session_state['quiz']['ticker']
-	df = most_recent_data(tickers=[randomTicker])[randomTicker]
+	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
 	randomIndex = st.session_state['quiz']['randomIndex']
 
 sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
