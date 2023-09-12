@@ -63,3 +63,17 @@ def doPatternRecognition():
 		return True
 	
 	return meta['settings']['pattern_recognition']
+
+
+def getSortBySetting():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return 'Pattern Rank', True
+	
+	if 'sort_by' not in meta['settings']:
+		return 'Pattern Rank', True
+	
+	if meta['settings']['sort_by'] == 'Pattern Rank':
+		return 'Pattern Rank', True
+	
+	return 'Volume Up %', False

@@ -5122,7 +5122,8 @@
     "last_sync_date": "2023-09-04",
     "settings": {
         "pattern_recognition": true,
-        "pivot_window": 21
+        "pivot_window": 21,
+        "sort_by": "Pattern Rank"
     },
     "watchlist": [
         "TATAPOWER",

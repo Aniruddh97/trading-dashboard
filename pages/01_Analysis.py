@@ -49,7 +49,10 @@ with st.form("Indice Selection"):
 
 if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     rank = pd.DataFrame(st.session_state['analysis']['rank'])
-    rank = rank.sort_values(by=['Volume Up %','Pattern Rank'], ascending=[False, True])
+    
+    sort, order = getSortBySetting()
+    rank = rank.sort_values(by=sort, ascending=order)
+    
     # rank_for_display = rank[rank.Pattern != 'NO_PATTERN']
     st.dataframe(rank)
 
