@@ -26,10 +26,11 @@ with st.form("Indice Selection"):
                     pattern = "NO_PATTERN"
                     rank = 999
                     df = ohlcLiveData[ticker]
-                    sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
                     
                     if patternRecognition:
                         pattern, rank = getLatestCandlePattern(df, all=True)
+                        
+                    sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
 
                     candleIndex = df.index.stop-1
                     analysis['data'][ticker] = sri.getIndicator(candleIndex)
