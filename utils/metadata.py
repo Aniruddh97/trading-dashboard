@@ -77,3 +77,14 @@ def getSortBySetting():
 		return 'Pattern Rank', True
 	
 	return 'Volume Up %', False
+
+
+def getFilterBySetting():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return []
+	
+	if 'filter_by' not in meta['settings']:
+		return []
+	
+	return meta['settings']['filter_by']

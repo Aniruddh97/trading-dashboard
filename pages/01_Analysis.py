@@ -54,7 +54,10 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     sort, order = getSortBySetting()
     rank = rank.sort_values(by=sort, ascending=order)
     
-    # rank_for_display = rank[rank.Pattern != 'NO_PATTERN']
+    filter = getFilterBySetting()
+    if len(filter) > 0:
+        rank = rank[rank.Pattern.isin(filter)]
+
     st.dataframe(rank)
 
     indicator_obj = st.session_state['analysis']['data']

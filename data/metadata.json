@@ -3986,9 +3986,9 @@
             "SBIN",
             "VINATIORGA",
             "BAJFINANCE",
-            "NEOGEN",
             "GRASIM",
             "HCC",
+            "NEOGEN",
             "INDUSINDBK",
             "AHLUCONT",
             "DRREDDY",
@@ -5102,7 +5102,7 @@
             "INFIBEAM"
         ]
     },
-    "last_sync_date": "2023-09-14",
+    "last_sync_date": "2023-09-04",
     "settings": {
         "pattern_recognition": true,
         "pivot_window": 21,
