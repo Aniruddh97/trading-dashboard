@@ -5105,9 +5105,11 @@
     "last_sync_date": "2023-09-04",
     "settings": {
         "candle_count": 69,
+        "chart_height": 550,
         "filter_by": [],
         "pattern_recognition": true,
         "pivot_window": 21,
+        "slider": false,
         "sort_by": "Pattern Rank",
         "wide_layout": true
     },

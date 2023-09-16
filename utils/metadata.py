@@ -54,6 +54,17 @@ def getPivotWindow():
 	return int(meta['settings']['pivot_window'])
 
 
+def getChartHeight():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return 500
+	
+	if 'chart_height' not in meta['settings']:
+		return 500
+	
+	return int(meta['settings']['chart_height'])
+
+
 def getCandleCount():
 	meta = readJSON()
 	if 'settings' not in meta:
@@ -110,3 +121,14 @@ def useWideLayout():
 		return False
 	
 	return meta['settings']['wide_layout']
+
+
+def useSlider():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return False
+	
+	if 'slider' not in meta['settings']:
+		return False
+	
+	return meta['settings']['slider']

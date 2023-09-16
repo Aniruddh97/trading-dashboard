@@ -46,10 +46,18 @@ if len(watchlist) > 0:
             st.session_state['watchlist'].append((ticker,chart))
         
     chartContainer = st.container()
-    for ticker, chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=limit_per_page):
+    
+    if useSlider():
+        chartIndex = st.slider('', min_value=0, max_value=len(st.session_state['watchlist'])-1)
+        ticker, chart = st.session_state['watchlist'][chartIndex]
         chartContainer.plotly_chart(chart, use_container_width=True)
         if chartContainer.button(f'Remove `{ticker}` from watchlist'):
             removeFromWatchlist(ticker=ticker)
+    else:
+        for ticker, chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=limit_per_page):
+            chartContainer.plotly_chart(chart, use_container_width=True)
+            if chartContainer.button(f'Remove `{ticker}` from watchlist'):
+                removeFromWatchlist(ticker=ticker)
         
 else:
     st.info('Watchlist is empty')

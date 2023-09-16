@@ -3,7 +3,7 @@ import streamlit as st
 from utils import *
 
 if useWideLayout():
-	st.set_page_config(layout="wide")
+    st.set_page_config(layout="wide")
 
 with st.form("Indice Selection"):
     try:
@@ -54,7 +54,7 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     rank = pd.DataFrame(st.session_state['analysis']['rank'])
     
     sort, order = getSortBySetting()
-    rank = rank.sort_values(by=sort, ascending=order)
+    rank = rank.sort_values(by=sort, ascending=order).reset_index(drop=True)
     
     filter = getFilterBySetting()
     if len(filter) > 0:
@@ -63,9 +63,19 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     st.dataframe(rank)
 
     indicator_obj = st.session_state['analysis']['data']
-
+    tickerList = rank.Ticker.to_list()
+    
     chartContainer = st.container()
-    for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
+        
+    if useSlider():
+        chartIndex = st.slider('', min_value=0, max_value=len(tickerList)-1)
+        ticker = tickerList[chartIndex]
         chartContainer.plotly_chart(indicator_obj[ticker], use_container_width=True)
         if chartContainer.button(f'Add `{ticker}` to watchlist'):
             addToWatchlist(ticker=ticker)
+    else:
+        for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
+            chartContainer.plotly_chart(indicator_obj[ticker], use_container_width=True)
+            if chartContainer.button(f'Add `{ticker}` to watchlist'):
+                addToWatchlist(ticker=ticker)
+    

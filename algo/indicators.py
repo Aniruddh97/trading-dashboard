@@ -3,7 +3,7 @@ import pandas as pd
 import pandas_ta as ta
 import plotly.graph_objects as go
 
-from utils import getPivotWindow, getCandleCount
+from utils import getPivotWindow, getCandleCount, getChartHeight
 from plotly.subplots import make_subplots
 
 
@@ -153,6 +153,7 @@ class SupportResistanceIndicator:
 
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
+        fig.update(layout_height=getChartHeight())
         return fig
         
     
