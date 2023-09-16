@@ -54,6 +54,17 @@ def getPivotWindow():
 	return int(meta['settings']['pivot_window'])
 
 
+def getCandleCount():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return 50
+	
+	if 'candle_count' not in meta['settings']:
+		return 50
+	
+	return int(meta['settings']['candle_count'])
+
+
 def doPatternRecognition():
 	meta = readJSON()
 	if 'settings' not in meta:

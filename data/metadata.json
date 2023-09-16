@@ -5104,6 +5104,8 @@
     },
     "last_sync_date": "2023-09-04",
     "settings": {
+        "candle_count": 69,
+        "filter_by": [],
         "pattern_recognition": true,
         "pivot_window": 21,
         "sort_by": "Pattern Rank"

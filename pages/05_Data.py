@@ -38,17 +38,16 @@ with sql:
                 container.plotly_chart(fig)
 
 with database:
-    st.markdown("""Reconcile""")
-    with st.form("Reconcile Segment Form"):
-        meta = readJSON(METADATA_FILE_PATH)
-        key = st.selectbox('Segment', meta['LIST'].keys())
-        period = st.selectbox('Period', ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'])
-        submitted = st.form_submit_button("Reconcile")
-        if submitted:
-            tickers = meta['LIST'][key]
-            db_df_obj = load_db_data(tickers=tickers)
-            reconcile_data(df_dict=db_df_obj, period=period)
 
+    st.markdown("""Sync DB""")
+    with st.form("Sync DB Form"):
+        meta = readJSON(METADATA_FILE_PATH)
+        duration = st.text_input('Time Duration', '5d')
+        submitted = st.form_submit_button("Sync")
+        if submitted:
+            start, end = getStartEndDate(timePeriod=duration)
+            update_db_data(start_date=start, end_date=end)
+            
     st.divider()
     st.markdown("""Recreate""")
     with st.form("Recreate DB Form"):
@@ -63,22 +62,21 @@ with database:
             writeJSON(meta, METADATA_FILE_PATH)
 
     st.divider()
+    st.markdown("""Reconcile""")
+    with st.form("Reconcile Segment Form"):
+        meta = readJSON(METADATA_FILE_PATH)
+        key = st.selectbox('Segment', meta['LIST'].keys())
+        period = st.selectbox('Period', ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'])
+        submitted = st.form_submit_button("Reconcile")
+        if submitted:
+            tickers = meta['LIST'][key]
+            db_df_obj = load_db_data(tickers=tickers)
+            reconcile_data(df_dict=db_df_obj, period=period)
+
+
+    st.divider()
     with st.expander("DB Operations"):
         
-        if st.button("Sync DB"):
-            meta = readJSON(METADATA_FILE_PATH)
-            if 'last_sync_date' in meta:
-                lastSyncDate = datetime.datetime.strptime(meta['last_sync_date'], DATE_FORMAT).date()
-                start_date = lastSyncDate + datetime.timedelta(days=1)
-                end_date = datetime.date.today()
-
-                if lastSyncDate == end_date:
-                    st.toast("Data is up-to-date")
-                else:
-                    update_db_data(start_date=start_date, end_date=end_date)
-            else:
-                st.toast("Please recreate database")
-
         if st.button("Backup DB"):
             if os.path.isfile(INDICE_DATABASE_PATH):
                 if os.path.isfile(INDICE_DATABASE_BACKUP_PATH):

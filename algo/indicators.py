@@ -3,7 +3,7 @@ import pandas as pd
 import pandas_ta as ta
 import plotly.graph_objects as go
 
-from utils import getPivotWindow
+from utils import getPivotWindow, getCandleCount
 from plotly.subplots import make_subplots
 
 
@@ -91,7 +91,7 @@ class SupportResistanceIndicator:
 
 
     def getIndicator(self, candleIndex):
-        start = candleIndex-50
+        start = candleIndex-getCandleCount()
         if start < 0:
             start = 0
         dfSlice = self.df[start:candleIndex+1]

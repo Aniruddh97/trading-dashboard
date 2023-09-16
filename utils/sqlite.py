@@ -141,76 +141,55 @@ def bhavcopy_index_range(start_date, end_date):
 
 
 def update_db_data(start_date, end_date):
-    stockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
-    indiceData = bhavcopy_index_range(start_date=start_date, end_date=end_date)
+    meta = readJSON()
+    newStockData = bhavcopy_stock_range(start_date=start_date, end_date=end_date)
+    dbStockData = load_db_data(tickers=meta['LIST']['NIFTY 500'])
 
-    if len(stockData.keys()) == 0 or len(indiceData.keys()) == 0:
+    if len(newStockData.keys()) == 0:
         st.warning('Failed to fetch from NSE, trying with yfinance for NIFTY 50')
-        meta = readJSON()
-        tickerList = meta['LIST']['NIFTY 100']
+        tickerList = meta['LIST']['NIFTY 500']
         delta = end_date - start_date
-        stockData = get_live_data_collection(tickers=tickerList, period=f'{delta.days}d')
+        newStockData = get_live_data_collection(tickers=tickerList, period=f'{delta.days}d')
         # convert df to dict
-        for stock in stockData:
-            stockData[stock] = stockData[stock].to_dict('records')
+        for stock in newStockData:
+            newStockData[stock] = newStockData[stock].to_dict('records')
 
     i = 0
-    conn = sqlite3.connect(STOCK_DATABASE_PATH)
-    my_bar = st.progress(0, text="Populating stock database")
-    for stock in stockData:
-        read_query = f'''
-            SELECT * FROM `{stock}` ORDER BY `DATE` DESC LIMIT 1
-        '''
-        df = execute_query(STOCK_DATABASE_PATH, read_query)
-        if df is None:
+    my_bar = st.progress(0, text="Syncing DB")
+    for ticker in dbStockData:
+        i += 1
+        my_bar.progress(int((i)*(100/len(dbStockData.keys()))), text=f"Syncing {ticker}")
+        if ticker not in newStockData:
             continue
 
-        i += 1
-        last_date = datetime.datetime.strptime(df['DATE'][0], DATE_FORMAT).date()
-        query=f'''
-            INSERT INTO `{stock}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
-        '''
-        for entry in stockData[stock]:
-            try:
-                my_bar.progress(int((i)*(100/len(stockData.keys()))), text=f'Populating stock database : {stock}')
-                if entry['DATE'] > last_date:
-                    conn.execute(query, entry)
-            except Exception as e:
-                st.toast(str(e))
-        conn.commit()
-    conn.close()
+        db_df = dbStockData[ticker]
+        ticker_dict_array = newStockData[ticker]
 
-    i = 0
-    conn = sqlite3.connect(INDICE_DATABASE_PATH)
-    my_bar = st.progress(0, text="Populating index database")
-    for indice in indiceData:
-        read_query = f'''
-            SELECT * FROM `{indice}` ORDER BY `DATE` DESC LIMIT 1
-        '''
-        df = execute_query(INDICE_DATABASE_PATH, read_query)
-        if df is None:
-            continue
+        append_list = []
+        for row in ticker_dict_array:
+            index_list = db_df.index[db_df.DATE == row['DATE']].tolist()
+            
+            if len(index_list) == 1:
+                db_index = index_list[0]
+                db_df.loc[db_index, ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']] = [row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['VOLUME']]
+            elif len(index_list) == 0:
+                append_list.append({
+                    "DATE": row['DATE'],
+                    "OPEN": row['OPEN'],
+                    "HIGH": row['HIGH'],
+                    "LOW": row['LOW'],
+                    "CLOSE": row['CLOSE'],
+                    "VOLUME": row['VOLUME'],
+                })
 
-        i += 1
-        last_date = datetime.datetime.strptime(df['DATE'][0], DATE_FORMAT).date()
-        query=f'''
-            INSERT INTO `{indice}` VALUES (:DATE,:OPEN,:HIGH,:LOW,:CLOSE,:VOLUME)
-        '''
-        for entry in indiceData[indice]:
-            try:
-                my_bar.progress(int((i)*(100/len(indiceData.keys()))), text=f'Populating index database : {indice}')
-                if entry['DATE'] > last_date:
-                    conn.execute(query, entry)
-            except Exception as e:
-                st.toast(str(e))
-        conn.commit()
-    conn.close()
-    
-    meta = readJSON(METADATA_FILE_PATH)
-    meta['last_sync_date'] = end_date
-    writeJSON(meta, METADATA_FILE_PATH)
-    
-    st.toast("Data update completed")
+        if len(append_list) > 0:
+            db_df = pd.concat([db_df, pd.DataFrame(append_list)], ignore_index=True)
+
+        db_df = db_df.sort_values(by="DATE", ascending=True).reset_index(drop=True)
+        replace_olhc_table(table=ticker, df=db_df)
+
+    my_bar.progress(100, text=f"DB Sync complete")
+
 
 def load_db_data(tickers):
     ohlcData = {}

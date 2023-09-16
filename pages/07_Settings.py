@@ -6,10 +6,12 @@ meta = readJSON()
 
 with st.form('Configure settings'):
     window = getPivotWindow()
+    candles = getCandleCount()
     patternRecognition = doPatternRecognition()
     filters = getFilterBySetting()
 
     pivot_window = st.number_input("Pivot Window", value=window, min_value=11, max_value=61)
+    candle_count = st.number_input("Candle Count", value=candles, min_value=50, max_value=120)
     doPatternRecognition = st.checkbox('Pattern Recognition', value=patternRecognition)
     sortby = st.selectbox('Sort By', ['Pattern Rank', 'Volume Up %'])
     filterby = st.multiselect('Filter By', options=candle_rankings.keys(), default=filters)
@@ -23,4 +25,5 @@ with st.form('Configure settings'):
         meta['settings']['pattern_recognition'] = doPatternRecognition
         meta['settings']['sort_by'] = sortby
         meta['settings']['filter_by'] = filterby
+        meta['settings']['candle_count'] = candle_count
         writeJSON(obj=meta)
