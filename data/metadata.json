@@ -5109,7 +5109,7 @@
         "filter_by": [],
         "pattern_recognition": true,
         "pivot_window": 21,
-        "slider": false,
+        "slider": true,
         "sort_by": "Pattern Rank",
         "wide_layout": true
     },

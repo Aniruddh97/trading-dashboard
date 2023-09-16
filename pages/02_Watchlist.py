@@ -3,6 +3,8 @@ import streamlit as st
 from utils import *
 from algo import *
 
+if useWideLayout():
+    st.set_page_config(layout="wide")
 
 meta = readJSON()
 tickerList = []

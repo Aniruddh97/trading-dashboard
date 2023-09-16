@@ -61,7 +61,17 @@ with st.form("Quiz Order Form"):
             target=target,
             stop_loss=stop_loss)
 		
-		st.plotly_chart(sri.getIndicator(result_idx), use_container_width=True)
+		start = df.index[df['DATE'] == pd.to_datetime(df.DATE[randomIndex]).date()].tolist()[0]
+		chart = sri.getIndicator(result_idx+25)
+		chart = decorate_pnl_chart(
+			chart=chart, 
+			start_x=start, 
+			end_x=result_idx, 
+			strike_price=df.CLOSE[randomIndex],
+			target=target,
+			stoploss=stop_loss,
+		)
+		st.plotly_chart(chart, use_container_width=True)
 
 		# P&L metric
 		result = round(result*units, 2)

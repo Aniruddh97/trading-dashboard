@@ -68,7 +68,9 @@ def display_pnl():
         st.info('No data available')
         return
 
-    st.session_state.pnl = []
+    if "pnl" not in st.session_state:
+        st.session_state.pnl = []
+    
     rrr = orders_df.rrr.mean()
     closed_positions_df = orders_df[orders_df.result.notnull()]
     pnl = round(closed_positions_df.result.astype(float).sum(), 2)
@@ -91,30 +93,92 @@ def display_pnl():
     tickers = list(set(closed_positions_df.ticker.to_list()))
     data_dict = most_recent_data(tickers=tickers, progress=False)
 
-    for index, row in closed_positions_df.iterrows():
-        df = data_dict[row.ticker]
-        sri = SupportResistanceIndicator(data=df, tickerName=row.ticker)
-        
-        marker_start_x = df.index[df['DATE'] == pd.to_datetime(row.start_date).date()].tolist()[0]
-        marker_start_y = df.LOW[marker_start_x] - (df.LOW[marker_start_x]/100)
-        
-        marker_end_x = df.index[df['DATE'] == pd.to_datetime(row.end_date).date()].tolist()[0]
-        marker_end_y = df.HIGH[marker_end_x] + (df.HIGH[marker_end_x]/100)
-        if row.position == "SHORT":
-            marker_start_y = df.HIGH[marker_start_x] + (abs((df.HIGH[marker_start_x]-df.LOW[marker_start_x])/5))
-            marker_end_y = df.LOW[marker_end_x] - (abs((df.HIGH[marker_end_x]-df.LOW[marker_end_x])/5))
+    if len(st.session_state.pnl) == 0:
+        for index, row in closed_positions_df.iterrows():
+            df = data_dict[row.ticker]
+            sri = SupportResistanceIndicator(data=df, tickerName=row.ticker)
+            
+            marker_start_x = df.index[df['DATE'] == pd.to_datetime(row.start_date).date()].tolist()[0]
+            marker_start_y = df.LOW[marker_start_x] - (df.LOW[marker_start_x]/100)
+            
+            marker_end_x = df.index[df['DATE'] == pd.to_datetime(row.end_date).date()].tolist()[0]
+            marker_end_y = df.HIGH[marker_end_x] + (df.HIGH[marker_end_x]/100)
+            if row.position == "SHORT":
+                marker_start_y = df.HIGH[marker_start_x] + (abs((df.HIGH[marker_start_x]-df.LOW[marker_start_x])/5))
+                marker_end_y = df.LOW[marker_end_x] - (abs((df.HIGH[marker_end_x]-df.LOW[marker_end_x])/5))
 
 
-        chart = sri.getIndicator(marker_end_x+10)
-        chart.add_scatter(
-            x=[marker_start_x, marker_end_x], 
-            y=[marker_start_y, marker_end_y], 
-            mode="markers",
-            marker=dict(size=8, color="white"), 
-            marker_symbol="star")
-        
-        st.session_state.pnl.append(chart)
+            chart = sri.getIndicator(marker_end_x+25)
+            chart = decorate_pnl_chart(
+                chart=chart, 
+                start_x=marker_start_x, 
+                end_x=marker_end_x, 
+                strike_price=row.strike_price,
+                target=row.target,
+                stoploss=row.stoploss,
+            )
+            
+            st.session_state.pnl.append(chart)
         
     chartContainer = st.container()
-    for chart in paginate(st.session_state.pnl, limit_per_page=10):
+
+    if useSlider():
+        chartIndex = st.slider('', min_value=0, max_value=len(st.session_state.pnl)-1)
+        chart = st.session_state['pnl'][chartIndex]
         chartContainer.plotly_chart(chart, use_container_width=True)
+    else:
+        for chart in paginate(st.session_state.pnl, limit_per_page=10):
+            chartContainer.plotly_chart(chart, use_container_width=True)
+
+
+def decorate_pnl_chart(chart, start_x, end_x, strike_price, target, stoploss):
+    # chart.add_scatter(
+    # x=[marker_start_x, marker_end_x], 
+    # y=[marker_start_y, marker_end_y], 
+    # mode="markers",
+    # marker=dict(size=8, color="white"), 
+    # marker_symbol="star")
+
+    # strike price line
+    chart.add_shape(
+            type='line',
+            x0=start_x,
+            y0=strike_price,
+            x1=end_x,
+            y1=strike_price,
+            line=dict(color="yellow", width=4),
+            xref='x',
+            yref='y',
+            row= 1,
+            col=1
+        )
+
+    # target line
+    chart.add_shape(
+            type='line',
+            x0=start_x,
+            y0=target,
+            x1=end_x,
+            y1=target,
+            line=dict(color="lightgreen", width=4),
+            xref='x',
+            yref='y',
+            row= 1,
+            col=1
+        )
+
+    # stoploss line
+    chart.add_shape(
+            type='line',
+            x0=start_x,
+            y0=stoploss,
+            x1=end_x,
+            y1=stoploss,
+            line=dict(color="orangered", width=4),
+            xref='x',
+            yref='y',
+            row= 1,
+            col=1
+        )
+
+    return chart
