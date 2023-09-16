@@ -99,3 +99,14 @@ def getFilterBySetting():
 		return []
 	
 	return meta['settings']['filter_by']
+
+
+def useWideLayout():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return False
+	
+	if 'wide_layout' not in meta['settings']:
+		return False
+	
+	return meta['settings']['wide_layout']

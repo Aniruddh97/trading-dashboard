@@ -117,4 +117,4 @@ def display_pnl():
         
     chartContainer = st.container()
     for chart in paginate(st.session_state.pnl, limit_per_page=10):
-        chartContainer.plotly_chart(chart)
+        chartContainer.plotly_chart(chart, use_container_width=True)

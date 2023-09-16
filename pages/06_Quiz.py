@@ -3,6 +3,9 @@ import streamlit as st
 
 from utils import *
 
+if useWideLayout():
+	st.set_page_config(layout="wide")
+
 if 'quiz' not in st.session_state:
 	st.session_state['quiz'] = {}
 	st.session_state['quiz']['last_result'] = 0
@@ -38,7 +41,7 @@ else:
 	randomIndex = st.session_state['quiz']['randomIndex']
 
 sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
-st.plotly_chart(sri.getIndicator(randomIndex))
+st.plotly_chart(sri.getIndicator(randomIndex), use_container_width=True)
 
 if st.button("Skip"):
 	del st.session_state['quiz']['ticker']
@@ -58,7 +61,7 @@ with st.form("Quiz Order Form"):
             target=target,
             stop_loss=stop_loss)
 		
-		st.plotly_chart(sri.getIndicator(result_idx))
+		st.plotly_chart(sri.getIndicator(result_idx), use_container_width=True)
 
 		# P&L metric
 		result = round(result*units, 2)

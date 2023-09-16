@@ -2,6 +2,8 @@ import streamlit as st
 
 from utils import *
 
+if useWideLayout():
+	st.set_page_config(layout="wide")
 
 with st.form("Indice Selection"):
     try:
@@ -64,6 +66,6 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
 
     chartContainer = st.container()
     for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
-        chartContainer.plotly_chart(indicator_obj[ticker])
+        chartContainer.plotly_chart(indicator_obj[ticker], use_container_width=True)
         if chartContainer.button(f'Add `{ticker}` to watchlist'):
             addToWatchlist(ticker=ticker)

@@ -2,6 +2,8 @@ import streamlit as st
 
 from utils import *
 
+if useWideLayout():
+	st.set_page_config(layout="wide")
 
 market_status = is_market_open()
 if market_status == -1:

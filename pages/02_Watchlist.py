@@ -47,7 +47,7 @@ if len(watchlist) > 0:
         
     chartContainer = st.container()
     for ticker, chart in paginate(datalist=st.session_state['watchlist'], limit_per_page=limit_per_page):
-        chartContainer.plotly_chart(chart)
+        chartContainer.plotly_chart(chart, use_container_width=True)
         if chartContainer.button(f'Remove `{ticker}` from watchlist'):
             removeFromWatchlist(ticker=ticker)
         

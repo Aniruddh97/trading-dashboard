@@ -35,7 +35,7 @@ with sql:
                 df = execute_query(db, query)
                 container.dataframe(df)
                 fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
-                container.plotly_chart(fig)
+                container.plotly_chart(fig, use_container_width=True)
 
 with database:
 
