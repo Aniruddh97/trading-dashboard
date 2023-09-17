@@ -36,6 +36,56 @@ class SupportResistanceIndicator:
         # return levels[abs(levels.diff()) > self.levelProximity]
 
 
+    def drawLevels(self, fig, dfSlice, candleIndex):
+        levels = self.getLevels(candleIndex)
+
+        # for better visuals
+        levels = levels[levels > (min(dfSlice.CLOSE) - self.levelProximity)]
+        levels = levels[levels < (max(dfSlice.HIGH) + self.levelProximity)]
+        # ------------------
+
+        # draw levels
+        for level in levels.to_list():
+            fig.add_shape(
+                type='line',
+                x0=dfSlice.index.start - 2,
+                y0=level,
+                x1=dfSlice.index.stop + 2,
+                y1=level,
+                line=dict(color="darkslategray"),
+                xref='x',
+                yref='y',
+                layer='below',
+                row= 1,
+                col=1
+            )
+
+        return fig
+
+    
+    def drawTrendline(self, fig, dfSlice):
+        supports = dfSlice[dfSlice.LOW == dfSlice.LOW.rolling(self.window, center=True).min()]
+        resistances = dfSlice[dfSlice.HIGH == dfSlice.HIGH.rolling(self.window, center=True).max()]
+        
+        x = np.array(range(dfSlice.index.start, dfSlice.index.stop))
+        if len(resistances.index.tolist()) > 1:
+            mresistance, cresistance = np.polyfit(resistances.index.tolist(), resistances.HIGH.tolist(), 1)
+            fig.add_trace(go.Scatter(x=x, y=mresistance*x + cresistance, line=dict(color="red", width=1), mode="lines", name="resistance trendline"))
+            # fig.add_scatter(x=resistances.index, y=resistances.HIGH, mode="markers",
+            #             marker=dict(size=7, color="red"),
+            #             name="pivot")
+
+        if len(supports.index.tolist()) > 1:
+            msupport, csupport = np.polyfit(supports.index.tolist(), supports.LOW.tolist(), 1)
+            fig.add_trace(go.Scatter(x=x, y=msupport*x + csupport, line=dict(color="yellow", width=1), mode="lines", name="support trendline"))
+            # fig.add_scatter(x=supports.index, y=supports.LOW, mode="markers",
+            #             marker=dict(size=7, color="yellow"),
+            #             name="pivot")
+
+
+        return fig
+
+
     def isCloseToResistance(self, candleIndex, levels):
         if len(levels)==0:
             return 0
@@ -103,54 +153,29 @@ class SupportResistanceIndicator:
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
                vertical_spacing=0.05, subplot_titles=(self.tickerName, patternTitle), 
                row_width=[0.2, 0.7])
-
-        # draw EMAS
-        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA14, line=dict(color="blue", width=1), name="EMA14", row=1, col=1),
-        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA26, line=dict(color="maroon", width=1), name="EMA26", row=1, col=1),
-
         
-        levels = self.getLevels(candleIndex)
-        # ------------------
-        # for better visuals
-        levels = levels[levels > (min(dfSlice.CLOSE) - self.levelProximity)]
-        levels = levels[levels < (max(dfSlice.HIGH) + self.levelProximity)]
-        # ------------------
-
-        # draw levels
-        for level in levels.to_list():
-            fig.add_shape(
-                type='line',
-                x0=dfSlice.index.start - 2,
-                y0=level,
-                x1=dfSlice.index.stop + 2,
-                y1=level,
-                line=dict(color="darkslategray"),
-                xref='x',
-                yref='y',
-                layer='below',
-                row= 1,
-                col=1
-            )
-            
         # draw candlestick
         fig.add_trace(go.Candlestick(x=dfSlice.index,
                                 open=dfSlice.OPEN,
                                 high=dfSlice.HIGH,
                                 low=dfSlice.LOW,
                                 close=dfSlice.CLOSE), row=1, col=1)
-
+        
         # plot volume
         if 'VOLUME' in dfSlice:
             fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice.VOLUME, showlegend=False), row=2, col=1)
 
-        # fig.add_scatter(x=dfSlice.index, y=dfSlice["SignalMarker"], mode="markers",
-        #                 marker=dict(size=7, color="Black"), marker_symbol="hexagram", name="signal")
-        # if 'Target' in dfSlice and 'Stoploss' in dfSlice:
-        #     fig.add_scatter(x=dfSlice.index, y=dfSlice["Target"], mode="markers",
-        #                     marker=dict(size=7, color="darkgreen"), name="target")
-        #     fig.add_scatter(x=dfSlice.index, y=dfSlice["Stoploss"], mode="markers",
-        #                     marker=dict(size=7, color="darkred"), name="stoploss")
+        # draw EMAS
+        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA14, line=dict(color="blue", width=1), name="EMA14", row=1, col=1),
+        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA26, line=dict(color="maroon", width=1), name="EMA26", row=1, col=1),
 
+        
+        # draw levels
+        # fig = self.drawLevels(fig=fig, dfSlice=dfSlice, candleIndex=candleIndex)
+
+        # draw trendlines
+        fig = self.drawTrendline(fig=fig, dfSlice=dfSlice)
+            
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
         fig.update(layout_height=getChartHeight())

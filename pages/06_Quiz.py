@@ -43,7 +43,7 @@ else:
 sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
 st.plotly_chart(sri.getIndicator(randomIndex), use_container_width=True)
 
-if st.button("Skip"):
+if st.button("Next"):
 	del st.session_state['quiz']['ticker']
 	del st.session_state['quiz']['randomIndex']
 	st.experimental_rerun()

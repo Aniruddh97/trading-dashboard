@@ -5104,7 +5104,7 @@
     },
     "last_sync_date": "2023-09-04",
     "settings": {
-        "candle_count": 69,
+        "candle_count": 120,
         "chart_height": 550,
         "filter_by": [],
         "pattern_recognition": true,
