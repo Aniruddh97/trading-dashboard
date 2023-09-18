@@ -5110,7 +5110,7 @@
         "pattern_recognition": true,
         "pivot_window": 21,
         "slider": true,
-        "sort_by": "Pattern Rank",
+        "sort_by": "Proximity %",
         "wide_layout": true
     },
     "watchlist": []

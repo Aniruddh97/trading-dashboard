@@ -40,6 +40,7 @@ with st.form("Indice Selection"):
                         'Ticker': ticker,
                         'Pattern': pattern,
                         'Pattern Rank': rank,
+                        'Proximity %': sri.proximity,
                         'Volume Up %': round((df.VOLUME[candleIndex]-df.VOLUME[candleIndex-1])/df.VOLUME[candleIndex-1], 2)*100,
                     })
 

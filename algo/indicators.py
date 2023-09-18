@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 import pandas_ta as ta
@@ -66,7 +67,10 @@ class SupportResistanceIndicator:
     def drawTrendline(self, fig, dfSlice):
         supports = dfSlice[dfSlice.LOW == dfSlice.LOW.rolling(self.window, center=True).min()]
         resistances = dfSlice[dfSlice.HIGH == dfSlice.HIGH.rolling(self.window, center=True).max()]
-        
+        prox1 = prox2 = prox3 = prox4 = 999
+        low = dfSlice.LOW.tolist()[-1]
+        high = dfSlice.HIGH.tolist()[-1]
+
         x = np.array(range(dfSlice.index.start, dfSlice.index.stop))
         if len(resistances.index.tolist()) > 1:
             mresistance, cresistance = np.polyfit(resistances.index.tolist(), resistances.HIGH.tolist(), 1)
@@ -74,6 +78,10 @@ class SupportResistanceIndicator:
             # fig.add_scatter(x=resistances.index, y=resistances.HIGH, mode="markers",
             #             marker=dict(size=7, color="red"),
             #             name="pivot")
+            
+            resis = mresistance*x[-1] + cresistance
+            prox1 = round(abs(low-resis)*100/resis, 2)
+            prox2 = round(abs(high-resis)*100/resis, 2)
 
         if len(supports.index.tolist()) > 1:
             msupport, csupport = np.polyfit(supports.index.tolist(), supports.LOW.tolist(), 1)
@@ -81,7 +89,11 @@ class SupportResistanceIndicator:
             # fig.add_scatter(x=supports.index, y=supports.LOW, mode="markers",
             #             marker=dict(size=7, color="yellow"),
             #             name="pivot")
+            supp = msupport*x[-1] + csupport
+            prox3 = round(abs(low-supp)*100/supp, 2)
+            prox4 = round(abs(high-supp)*100/supp, 2)
 
+        self.proximity = min(prox1, prox2, prox3, prox4)
 
         return fig
 

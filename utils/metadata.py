@@ -98,6 +98,9 @@ def getSortBySetting():
 	if meta['settings']['sort_by'] == 'Pattern Rank':
 		return 'Pattern Rank', True
 	
+	if meta['settings']['sort_by'] == 'Proximity %':
+		return 'Proximity %', True
+	
 	return 'Volume Up %', False
 
 
