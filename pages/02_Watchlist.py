@@ -31,8 +31,6 @@ if len(watchlist) > 0:
     limit_per_page = 10
     if ('watchlist' in st.session_state 
             and len(st.session_state['watchlist']) != 0 
-            and (is_market_open() != 1 
-            or st.session_state.page != (math.ceil((len(watchlist) / limit_per_page)) - 1))
         ):
         pass
     else:
