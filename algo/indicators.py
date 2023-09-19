@@ -67,7 +67,8 @@ class SupportResistanceIndicator:
     def drawTrendline(self, fig, dfSlice):
         supports = dfSlice[dfSlice.LOW == dfSlice.LOW.rolling(self.window, center=True).min()]
         resistances = dfSlice[dfSlice.HIGH == dfSlice.HIGH.rolling(self.window, center=True).max()]
-        prox1 = prox2 = prox3 = prox4 = 999
+        proxLCTR = proxHCTR = proxLCTS = proxHCTS = 999
+        mresistance = msupport = supp = resis = None
         low = dfSlice.LOW.tolist()[-1]
         high = dfSlice.HIGH.tolist()[-1]
 
@@ -80,8 +81,8 @@ class SupportResistanceIndicator:
             #             name="pivot")
             
             resis = mresistance*x[-1] + cresistance
-            prox1 = round(abs(low-resis)*100/resis, 2)
-            prox2 = round(abs(high-resis)*100/resis, 2)
+            proxLCTR = round(abs(low-resis)*100/resis, 2)
+            proxHCTR = round(abs(high-resis)*100/resis, 2)
 
         if len(supports.index.tolist()) > 1:
             msupport, csupport = np.polyfit(supports.index.tolist(), supports.LOW.tolist(), 1)
@@ -90,12 +91,155 @@ class SupportResistanceIndicator:
             #             marker=dict(size=7, color="yellow"),
             #             name="pivot")
             supp = msupport*x[-1] + csupport
-            prox3 = round(abs(low-supp)*100/supp, 2)
-            prox4 = round(abs(high-supp)*100/supp, 2)
+            proxLCTS = round(abs(low-supp)*100/supp, 2)
+            proxHCTS = round(abs(high-supp)*100/supp, 2)
 
-        self.proximity = min(prox1, prox2, prox3, prox4)
+        self.proximity = min(proxLCTR, proxHCTR, proxLCTS, proxHCTS)
 
         return fig
+    
+
+    def createOrder(self, candleIndex, stop_loss, target, strike_price):
+        return {
+            "valid": True,
+            "candleIndex": candleIndex,
+            "proximity": self.proximity,
+            "stop_loss": stop_loss,
+            "target": target,
+            "strike_price": strike_price
+        }
+
+
+    def getOrder(self, candleIndex):
+        start = candleIndex-getCandleCount()
+        if start < 0:
+            start = 0
+        dfSlice = self.df[start:candleIndex+1]
+    
+        supports = dfSlice[dfSlice.LOW == dfSlice.LOW.rolling(self.window, center=True).min()]
+        resistances = dfSlice[dfSlice.HIGH == dfSlice.HIGH.rolling(self.window, center=True).max()]
+        proxLCTR = proxHCTR = proxLCTS = proxHCTS = 999
+        low = dfSlice.LOW[candleIndex]
+        high = dfSlice.HIGH[candleIndex]
+
+        x = np.array(range(dfSlice.index.start, dfSlice.index.stop))
+        if len(resistances.index.tolist()) > 1:
+            mresistance, cresistance = np.polyfit(resistances.index.tolist(), resistances.HIGH.tolist(), 1)
+            resis = mresistance*x[-1] + cresistance
+            proxLCTR = round(abs(low-resis)*100/resis, 2)
+            proxHCTR = round(abs(high-resis)*100/resis, 2)
+
+        if len(supports.index.tolist()) > 1:
+            msupport, csupport = np.polyfit(supports.index.tolist(), supports.LOW.tolist(), 1)
+            supp = msupport*x[-1] + csupport
+            proxLCTS = round(abs(low-supp)*100/supp, 2)
+            proxHCTS = round(abs(high-supp)*100/supp, 2)
+
+        self.proximity = min(proxLCTR, proxHCTR, proxLCTS, proxHCTS)
+
+        order = {
+            "valid": False,
+            "proximity": self.proximity,
+        }
+
+        # proximity threshold
+        if self.proximity > 1:
+            return order
+        
+        data = dfSlice.tail(1).to_dict('records')[-1]
+        if self.proximity == proxLCTR:
+
+            if mresistance < 0:
+                if data['CLOSE'] > data['OPEN']:
+                    stop_loss = round(mresistance*(x[-1]+5) + cresistance, 2)
+                    target = round(data['CLOSE'] + 1.5*(data['CLOSE']-stop_loss), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            else:
+                if data['CLOSE'] > data['OPEN']:
+                    stop_loss = mresistance*(x[-1]-5) + cresistance
+                    target = round(data['CLOSE'] + 1.5*(data['CLOSE']-stop_loss), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            
+        elif self.proximity == proxHCTR:
+
+            if mresistance < 0:
+                if data['OPEN'] > data['CLOSE']:
+                    stop_loss = mresistance*(x[-1]-5) + cresistance
+                    target = round(data['CLOSE'] - 1.5*(stop_loss-data['CLOSE']), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            else:
+                if data['OPEN'] > data['CLOSE']:
+                    stop_loss = mresistance*(x[-1]-5) + cresistance
+                    target = round(data['CLOSE'] - 1.5*(stop_loss-data['CLOSE']), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            
+        elif self.proximity == proxLCTS:
+
+            if msupport < 0:
+                if data['CLOSE'] > data['OPEN']:
+                    stop_loss = round(msupport*(x[-1]+5) + csupport, 2)
+                    target = round(data['CLOSE'] + 1.5*(data['CLOSE']-stop_loss), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            else:
+                if data['CLOSE'] > data['OPEN']:
+                    stop_loss = msupport*(x[-1]-5) + csupport
+                    target = round(data['CLOSE'] + 1.5*(data['CLOSE']-stop_loss), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+
+        elif self.proximity == proxHCTS:
+
+            if msupport < 0:
+                if data['OPEN'] > data['CLOSE']:
+                    stop_loss = msupport*(x[-1]-5) + csupport
+                    target = round(data['CLOSE'] - 1.5*(stop_loss-data['CLOSE']), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+            else:
+                if data['OPEN'] > data['CLOSE']:
+                    stop_loss = msupport*(x[-1]+5) + csupport
+                    target = round(data['CLOSE'] - 1.5*(stop_loss-data['CLOSE']), 2)
+                    return self.createOrder(
+                        candleIndex=candleIndex, 
+                        stop_loss=stop_loss,
+                        target=target,
+                        strike_price=data['CLOSE']
+                    )
+                
+        return order
 
 
     def isCloseToResistance(self, candleIndex, levels):
@@ -150,6 +294,35 @@ class SupportResistanceIndicator:
             return 2
         else:
             return 0
+        
+    
+    def getCandleChart(self):
+        dfSlice = self.df
+
+        fig = make_subplots(
+            rows=2, 
+            cols=1, 
+            shared_xaxes=True, 
+            vertical_spacing=0.05, 
+            subplot_titles=(self.tickerName, self.patternTitle), 
+            row_width=[0.2, 0.7]
+        )
+        
+        # draw candlestick
+        fig.add_trace(go.Candlestick(x=dfSlice.index,
+                                open=dfSlice.OPEN,
+                                high=dfSlice.HIGH,
+                                low=dfSlice.LOW,
+                                close=dfSlice.CLOSE), row=1, col=1)
+    
+        # plot volume
+        if 'VOLUME' in dfSlice:
+            fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice.VOLUME, showlegend=False), row=2, col=1)
+
+        fig.update(layout_xaxis_rangeslider_visible=False)
+        fig.update(layout_showlegend=False)
+        fig.update(layout_height=getChartHeight())
+        return fig
 
 
     def getIndicator(self, candleIndex):

@@ -17,24 +17,33 @@ def evaluate_trade(data, date, strike_price, target, stop_loss):
     position = 'LONG' if target > strike_price else 'SHORT'
 
     for i in range(start, end+1):
-        if position == 'LONG':
-            if data.LOW[i] <= stop_loss:
-                result = stop_loss - strike_price
-            elif data.HIGH[i] >= target:
-                result = target - strike_price
-        else:
-            if data.LOW[i] <= target:
-                result = strike_price - target
-            elif data.HIGH[i] >= stop_loss:
-                result = strike_price - stop_loss
-
+        result = get_trade_result(data, position, i, stop_loss, target, strike_price)
         result_index = i
+
         if result != 0:
-            result = round(float(result),2)
             break
     
     return result, result_index
 
+
+def get_trade_result(data, position, candleIndex, stop_loss, target, strike_price):
+    result = 0
+
+    if position == 'LONG':
+        if data.LOW[candleIndex] <= stop_loss:
+            result = stop_loss - strike_price
+        elif data.HIGH[candleIndex] >= target:
+            result = target - strike_price
+    else:
+        if data.LOW[candleIndex] <= target:
+            result = strike_price - target
+        elif data.HIGH[candleIndex] >= stop_loss:
+            result = strike_price - stop_loss
+
+    if result != 0:
+        result = round(float(result),2)
+
+    return result
 
 def process_open_trades():
     open_position_df = execute_query(ORDER_DATABASE_PATH, query="SELECT * FROM orders WHERE result IS NULL")
