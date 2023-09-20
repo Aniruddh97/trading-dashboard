@@ -35,7 +35,9 @@ with st.form("Indice Selection"):
                     sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
 
                     candleIndex = df.index.stop-1
-                    analysis['data'][ticker] = sri.getIndicator(candleIndex)
+                    analysis['data'][ticker] = {}
+                    analysis['data'][ticker]['indicator'] = sri.getIndicator(candleIndex)
+                    analysis['data'][ticker]['full_chart'] = sri.getCandleChart()
                     analysis['rank'].append({
                         'Ticker': ticker,
                         'Pattern': pattern,
@@ -71,7 +73,8 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     if useSlider():
         chartIndex = st.slider('', min_value=0, max_value=len(tickerList)-1)
         ticker = tickerList[chartIndex]
-        chartContainer.plotly_chart(indicator_obj[ticker], use_container_width=True)
+        chartContainer.plotly_chart(indicator_obj[ticker]['indicator'], use_container_width=True)
+        chartContainer.plotly_chart(indicator_obj[ticker]['full_chart'], use_container_width=True)
         if chartContainer.button(f'Add `{ticker}` to watchlist'):
             addToWatchlist(ticker=ticker)
     else:
