@@ -109,10 +109,21 @@ def getFilterBySetting():
 	if 'settings' not in meta:
 		return []
 	
-	if 'filter_by' not in meta['settings']:
+	if 'pattern_filter' not in meta['settings']:
 		return []
 	
-	return meta['settings']['filter_by']
+	return meta['settings']['pattern_filter']
+
+
+def getIndicatorSetting():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return []
+	
+	if 'indicator' not in meta['settings']:
+		return []
+	
+	return meta['settings']['indicator']
 
 
 def useWideLayout():

@@ -30,9 +30,13 @@ meta = readJSON(METADATA_FILE_PATH)
 tickers = meta['LIST']['NIFTY 500']
 
 if 'ticker' not in st.session_state['quiz']:
-	randomTicker = tickers[random.randint(0, len(tickers))]
-	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
-	randomIndex = random.randint(df.index.start+50, df.index.stop-50)
+	try:
+		randomTicker = tickers[random.randint(0, len(tickers)-1)]
+		df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
+		randomIndex = random.randint(df.index.start+50, df.index.stop-50)
+	except:
+		st.experimental_rerun()
+
 	st.session_state['quiz']['ticker'] = randomTicker
 	st.session_state['quiz']['randomIndex'] = randomIndex
 else:
@@ -41,12 +45,17 @@ else:
 	randomIndex = st.session_state['quiz']['randomIndex']
 
 sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
+pattern, rank = getLatestCandlePattern(df[0:randomIndex+1], all=True)
+sri.patternTitle = pattern
 st.plotly_chart(sri.getIndicator(randomIndex), use_container_width=True)
 
 if st.button("Next"):
 	del st.session_state['quiz']['ticker']
 	del st.session_state['quiz']['randomIndex']
 	st.experimental_rerun()
+
+if st.button("Next Candle"):
+	st.session_state['quiz']['randomIndex'] = st.session_state['quiz']['randomIndex'] + 1
 
 with st.form("Quiz Order Form"):
 	stop_loss = st.number_input("Stoploss")

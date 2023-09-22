@@ -4,7 +4,7 @@ import pandas as pd
 import pandas_ta as ta
 import plotly.graph_objects as go
 
-from utils import getPivotWindow, getCandleCount, getChartHeight
+from utils import getPivotWindow, getCandleCount, getChartHeight, getIndicatorSetting
 from plotly.subplots import make_subplots
 
 
@@ -18,8 +18,6 @@ class SupportResistanceIndicator:
         self.patternTitle = patternTitle
         self.RRR = 1.5
         # self.df['RSI'] = ta.rsi(data.CLOSE, length=14)
-        # self.df["EMA14"] = ta.ema(data.CLOSE, length=14)
-        # self.df["EMA26"] = ta.ema(data.CLOSE, length=26)
         # self.df['Level'] = 0
 
         # candle proximity with a level
@@ -36,6 +34,18 @@ class SupportResistanceIndicator:
         return levels
         # return levels[abs(levels.diff()) > self.levelProximity]
 
+    
+    def drawEMA(self, fig, dfSlice):
+        dfSlice["EMAA"] = ta.ema(dfSlice.CLOSE, length=5)
+        dfSlice["EMAB"] = ta.ema(dfSlice.CLOSE, length=8)
+        dfSlice["EMAC"] = ta.ema(dfSlice.CLOSE, length=13)
+
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMAA, line=dict(color="orange", width=2.25), name="EMAA", row=1, col=1),
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMAB, line=dict(color="yellow", width=2.25), name="EMAB", row=1, col=1),
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMAC, line=dict(color="cornflowerblue", width=2.25), name="EMAC", row=1, col=1),
+
+        return fig
+    
 
     def drawLevels(self, fig, dfSlice, candleIndex):
         levels = self.getLevels(candleIndex)
@@ -53,7 +63,7 @@ class SupportResistanceIndicator:
                 y0=level,
                 x1=dfSlice.index.stop + 2,
                 y1=level,
-                line=dict(color="darkslategray"),
+                line=dict(color="#38527a"),
                 xref='x',
                 yref='y',
                 layer='below',
@@ -296,8 +306,11 @@ class SupportResistanceIndicator:
             return 0
         
     
-    def getCandleChart(self):
-        dfSlice = self.df
+    def getCandleChart(self, candleIndex=None):
+        if not candleIndex:
+            candleIndex = self.df.index.stop-1
+
+        dfSlice = self.df[0:candleIndex+1]
 
         fig = make_subplots(
             rows=2, 
@@ -351,19 +364,23 @@ class SupportResistanceIndicator:
             fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice.VOLUME, showlegend=False), row=2, col=1)
 
         # draw EMAS
-        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA14, line=dict(color="blue", width=1), name="EMA14", row=1, col=1),
-        # fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA26, line=dict(color="maroon", width=1), name="EMA26", row=1, col=1),
+        ind = getIndicatorSetting()
 
+        if 'EMA' in ind:
+            fig = self.drawEMA(fig=fig, dfSlice=dfSlice)
         
         # draw levels
-        # fig = self.drawLevels(fig=fig, dfSlice=dfSlice, candleIndex=candleIndex)
+        if 'S&R' in ind:
+            fig = self.drawLevels(fig=fig, dfSlice=dfSlice, candleIndex=candleIndex)
 
         # draw trendlines
-        fig = self.drawTrendline(fig=fig, dfSlice=dfSlice)
+        if 'Trendline' in ind:
+            fig = self.drawTrendline(fig=fig, dfSlice=dfSlice)
             
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
         fig.update(layout_height=getChartHeight())
+        # fig.update(layout_dragmode='drawline')
         return fig
         
     

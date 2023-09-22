@@ -24,7 +24,7 @@ with st.form("Study form"):
 container = st.container()
 if 'study_ticker' in st.session_state:
 	df = st.session_state['study_ticker_data']
-	candleIndex = st.slider('', min_value=df.index.start+getCandleCount(), max_value=df.index.stop)
+	candleIndex = st.slider('', min_value=df.index.start+getCandleCount(), max_value=df.index.stop-1)
 
 	sri = SupportResistanceIndicator(df, 11, 5, st.session_state['study_ticker'])
 	fig = sri.getIndicator(candleIndex)
