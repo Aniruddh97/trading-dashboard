@@ -1,5 +1,6 @@
 import streamlit as st
 
+from algo import *
 from utils import *
 
 if useWideLayout():
@@ -22,7 +23,7 @@ with st.form('Configure settings'):
     chart_height = st.number_input("Chart Height", value=cheight, min_value=250, max_value=750)
     
     window = getPivotWindow()
-    pivot_window = st.number_input("Pivot Window", value=window, min_value=11, max_value=61)
+    pivot_window = st.number_input("Window", value=window, min_value=11, max_value=200)
     
     candles = getCandleCount()
     candle_count = st.number_input("Candle Count", value=candles, min_value=50, max_value=240)
@@ -34,7 +35,7 @@ with st.form('Configure settings'):
     inds = getIndicatorSetting()
     indicator = st.multiselect('Indicator', options=indArray, default=inds)
     
-    sortArray = ['Proximity %', 'Pattern Rank', 'Volume Up %']
+    sortArray = ['Proximity %', 'Pattern Rank', 'Volume Up %', 'Signal']
     sortby, _ = getSortBySetting()
     sortby = st.selectbox('Sort By', sortArray, index=sortArray.index(sortby))
 

@@ -1,6 +1,7 @@
 import random
 import streamlit as st
 
+from algo import *
 from utils import *
 
 if useWideLayout():
@@ -33,7 +34,10 @@ if 'ticker' not in st.session_state['quiz']:
 	try:
 		randomTicker = tickers[random.randint(0, len(tickers)-1)]
 		df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
-		randomIndex = random.randint(df.index.start+50, df.index.stop-50)
+		randomIndex = random.randint(df.index.start+getCandleCount(), df.index.stop-50)
+		ind = getIndicators(data=df, ticker=randomTicker)[0]
+		while not ind.getOrder(randomIndex)["valid"] and randomIndex < df.index.stop - 50:
+			randomIndex += 1
 	except:
 		st.experimental_rerun()
 
@@ -44,10 +48,9 @@ else:
 	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
 	randomIndex = st.session_state['quiz']['randomIndex']
 
-sri = SupportResistanceIndicator(data=df, tickerName=randomTicker)
 pattern, rank = getLatestCandlePattern(df[0:randomIndex+1], all=True)
-sri.patternTitle = pattern
-st.plotly_chart(sri.getIndicator(randomIndex), use_container_width=True)
+ind = getIndicators(data=df, ticker=randomTicker, pattern=pattern)[0]
+st.plotly_chart(ind.getIndicator(randomIndex), use_container_width=True)
 
 if st.button("Next"):
 	del st.session_state['quiz']['ticker']
@@ -71,7 +74,7 @@ with st.form("Quiz Order Form"):
             stop_loss=stop_loss)
 		
 		start = df.index[df['DATE'] == pd.to_datetime(df.DATE[randomIndex]).date()].tolist()[0]
-		chart = sri.getIndicator(result_idx+25)
+		chart = ind.getIndicator(result_idx+25)
 		chart = decorate_pnl_chart(
 			chart=chart, 
 			start_x=start, 

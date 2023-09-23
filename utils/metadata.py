@@ -100,6 +100,9 @@ def getSortBySetting():
 	
 	if meta['settings']['sort_by'] == 'Proximity %':
 		return 'Proximity %', True
+
+	if meta['settings']['sort_by'] == 'Signal':
+		return 'Signal', False
 	
 	return 'Volume Up %', False
 

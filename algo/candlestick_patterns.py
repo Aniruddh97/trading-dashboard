@@ -11,6 +11,35 @@ def getCandlePatternList(all=False):
     return talib.get_function_groups()['Pattern Recognition']
 
 
+def getCandlestickPattern(df, candleIndex):
+
+    if (candleIndex - 15) < df.index.start or candleIndex > (df.index.stop - 1):
+        return ['NO_PATTERN']
+
+    df = df[candleIndex-15:candleIndex+1].copy(deep=True)
+    df = df.reset_index(drop=True)
+    
+    op = df['OPEN'].astype(float)
+    lo = df['LOW'].astype(float)
+    hi = df['HIGH'].astype(float)
+    cl = df['CLOSE'].astype(float)
+
+    candlePatterns = talib.get_function_groups()['Pattern Recognition']
+    for candle in candlePatterns:
+        df[candle] = getattr(talib, candle)(op, hi, lo, cl)
+
+    row = df.iloc[-1]
+    patterns = list(compress(row[candlePatterns].keys(), row[candlePatterns].values != 0))
+    container = []
+    for pattern in patterns:
+        if row[pattern] > 0:
+            container.append(pattern + '_Bull')
+        else:
+            container.append(pattern + '_Bear')
+
+    return container
+
+
 def getLatestCandlePattern(df, all=False):
     
     df = df.tail(15).copy(deep=True)
@@ -98,7 +127,7 @@ def recognizePattern(df, all=False):
     return df
 
 candle_rankings = {
-		"NO_PATTERN": 999,
+        "NO_PATTERN": 999,
         "CDL3LINESTRIKE_Bull": 1,
         "CDL3LINESTRIKE_Bear": 2,
         "CDL3BLACKCROWS_Bull": 3,

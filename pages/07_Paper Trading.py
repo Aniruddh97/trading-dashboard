@@ -1,5 +1,6 @@
 import streamlit as st
 
+from algo import *
 from utils import *
 
 
@@ -8,8 +9,8 @@ selected_ticker = st.selectbox('Search', meta['LIST']['NIFTY 500'])
 df = most_recent_data(tickers=[selected_ticker])[selected_ticker]
 
 pattern, rank = getLatestCandlePattern(df=df, all=True)
-sri = SupportResistanceIndicator(data=df, tickerName=selected_ticker, patternTitle=pattern)
-st.plotly_chart(sri.getIndicator(df.index.stop-1), use_container_width=True)
+ind = getIndicators(data=df, ticker=selected_ticker, pattern=pattern)[0]
+st.plotly_chart(ind.getIndicator(df.index.stop-1), use_container_width=True)
 
 with st.form("Order Form"):
 	stop_loss = st.number_input("Stoploss")

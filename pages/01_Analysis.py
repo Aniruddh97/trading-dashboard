@@ -1,5 +1,6 @@
 import streamlit as st
 
+from algo import *
 from utils import *
 
 if useWideLayout():
@@ -23,27 +24,33 @@ with st.form("Indice Selection"):
                 patternRecognition = doPatternRecognition()
                 pbar = st.progress(0, text=f"Analyzing data")
                 for ticker in ohlcLiveData:
-                    i += 1
-                    pbar.progress(int((i)*(100/len(tickers))), text=f"Analyzing {ticker}")
-                    pattern = "NO_PATTERN"
-                    rank = 999
-                    df = ohlcLiveData[ticker]
-                    
-                    if patternRecognition:
-                        pattern, rank = getLatestCandlePattern(df, all=True)
+                    try:
+                        i += 1
+                        pbar.progress(int((i)*(100/len(tickers))), text=f"Analyzing {ticker}")
+                        pattern = "NO_PATTERN"
+                        rank = 999
+                        df = ohlcLiveData[ticker]
                         
-                    sri = SupportResistanceIndicator(data=df, tickerName=ticker, patternTitle=pattern)
+                        if patternRecognition:
+                            pattern, rank = getLatestCandlePattern(df, all=True)
+                            
+                        ind = getIndicators(data=df, ticker=ticker, pattern=pattern)[0]
 
-                    candleIndex = df.index.stop-1
-                    analysis['data'][ticker] = {}
-                    analysis['data'][ticker]['indicator'] = sri.getIndicator(candleIndex)
-                    analysis['rank'].append({
-                        'Ticker': ticker,
-                        'Pattern': pattern,
-                        'Pattern Rank': rank,
-                        'Proximity %': sri.proximity,
-                        'Volume Up %': round((df.VOLUME[candleIndex]-df.VOLUME[candleIndex-1])/df.VOLUME[candleIndex-1], 2)*100,
-                    })
+                        candleIndex = df.index.stop-1
+                        analysis['data'][ticker] = {}
+                        analysis['data'][ticker]['indicator'] = ind.getIndicator(candleIndex)
+                        order = ind.getOrder(candleIndex)
+                        analysis['rank'].append({
+                            'Ticker': ticker,
+                            'Signal': order["signal"],
+                            'Pattern': pattern,
+                            'Pattern Rank': rank,
+                            'Proximity %': order["proximity"],
+                            'Volume Up %': round((df.VOLUME[candleIndex]-df.VOLUME[candleIndex-1])/df.VOLUME[candleIndex-1], 2)*100,
+                        })
+                    except Exception as e:
+                        print(e)
+                        continue
 
                 pbar.progress(100, text=f"Analysis complete")
                 st.session_state['analysis'] = analysis

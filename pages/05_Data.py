@@ -3,6 +3,7 @@ import shutil
 import pandas as pd
 import streamlit as st
 
+from algo import *
 from utils import *
 from zipfile import ZipFile
 
@@ -34,7 +35,8 @@ with sql:
                     db = ORDER_DATABASE_PATH
                 df = execute_query(db, query)
                 container.dataframe(df)
-                fig = SupportResistanceIndicator(df, 11, 5, "").getIndicator(df.index.stop-1)
+                ind = getIndicators(data=df)[0]
+                fig = ind.getIndicator(df.index.stop-1)
                 container.plotly_chart(fig, use_container_width=True)
 
 with database:

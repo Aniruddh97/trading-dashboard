@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from utils import *
+from algo import *
 
 if useWideLayout():
     st.set_page_config(layout="wide")
@@ -16,6 +17,10 @@ with st.form("Study form"):
 	if submitted:
 		st.session_state['study_ticker'] = ticker
 		st.session_state['study_ticker_data'] = load_db_data(tickers=[ticker])[ticker]
+		st.session_state['study_ticker_indicators'] = getIndicators(
+			data=st.session_state['study_ticker_data'],
+			ticker=ticker
+		)
 		
 		st.session_state['study_result'] = 0
 		if 'study_order' in st.session_state:
@@ -26,10 +31,10 @@ if 'study_ticker' in st.session_state:
 	df = st.session_state['study_ticker_data']
 	candleIndex = st.slider('', min_value=df.index.start+getCandleCount(), max_value=df.index.stop-1)
 
-	sri = SupportResistanceIndicator(df, 11, 5, st.session_state['study_ticker'])
-	fig = sri.getIndicator(candleIndex)
+	indicator = st.session_state['study_ticker_indicators'][0]
+	fig = indicator.getIndicator(candleIndex)
 
-	new_order = sri.getOrder(candleIndex=candleIndex)
+	new_order = indicator.getOrder(candleIndex=candleIndex)
 
 	col1, col2 = st.columns(2)
 	col2.write(new_order)
@@ -92,4 +97,4 @@ if 'study_ticker' in st.session_state:
 
 	container.plotly_chart(fig, use_container_width=True)
 
-	st.write(st.session_state['study_result'])
+	st.write(f"P&L : {round(st.session_state['study_result'], 2)}")

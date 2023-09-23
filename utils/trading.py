@@ -105,7 +105,7 @@ def display_pnl():
     if len(st.session_state.pnl) == 0:
         for index, row in closed_positions_df.iterrows():
             df = data_dict[row.ticker]
-            sri = SupportResistanceIndicator(data=df, tickerName=row.ticker)
+            ind = getIndicators(data=df, ticker=row.ticker)[0]
             
             marker_start_x = df.index[df['DATE'] == pd.to_datetime(row.start_date).date()].tolist()[0]
             marker_start_y = df.LOW[marker_start_x] - (df.LOW[marker_start_x]/100)
@@ -117,7 +117,7 @@ def display_pnl():
                 marker_end_y = df.LOW[marker_end_x] - (abs((df.HIGH[marker_end_x]-df.LOW[marker_end_x])/5))
 
 
-            chart = sri.getIndicator(marker_end_x+25)
+            chart = ind.getIndicator(marker_end_x+25)
             chart = decorate_pnl_chart(
                 chart=chart, 
                 start_x=marker_start_x, 

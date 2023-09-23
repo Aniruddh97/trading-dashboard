@@ -5109,25 +5109,10 @@
         ],
         "pattern_filter": [],
         "pattern_recognition": true,
-        "pivot_window": 31,
+        "pivot_window": 21,
         "slider": true,
-        "sort_by": "Pattern Rank",
+        "sort_by": "Signal",
         "wide_layout": true
     },
-    "watchlist": [
-        "HEROMOTOCO",
-        "AXISBANK",
-        "SBILIFE",
-        "HINDALCO",
-        "TATASTEEL",
-        "NTPC",
-        "BAJFINANCE",
-        "KOTAKBANK",
-        "TITAN",
-        "DRREDDY",
-        "MARUTI",
-        "ULTRACEMCO",
-        "TATAMOTORS",
-        "ASIANPAINT"
-    ]
+    "watchlist": []
 }
