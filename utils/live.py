@@ -3,7 +3,7 @@ import yfinance as yf
 import streamlit as st
 
 def get_live_data(ticker, period='1d', interval='1d'):
-    if 'NS' not in ticker:
+    if '.NS' not in ticker:
         ticker = ticker + '.NS'
 
     data = yf.download(ticker, interval=interval, period=period, progress=False)
