@@ -15,6 +15,7 @@ class SupportResistanceIndicator(Indicator):
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
+        self.df["SMA200"] = talib.SMA(data.CLOSE, timeperiod=200)
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
@@ -33,6 +34,11 @@ class SupportResistanceIndicator(Indicator):
                 filteredLevels.append(currentLevel)
 
         return filteredLevels
+    
+    
+    def drawSMA(self, fig, dfSlice):
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.SMA200, line=dict(color="aliceblue", width=0.25), name="200 SMA", row=1, col=1),
+        return fig
 
     
     def drawLevels(self, fig, dfSlice, candleIndex):
@@ -86,6 +92,9 @@ class SupportResistanceIndicator(Indicator):
 
         # draw levels
         fig = self.drawLevels(fig=fig, dfSlice=dfSlice, candleIndex=candleIndex)
+
+        # draw sma
+        fig = self.drawSMA(fig=fig, dfSlice=dfSlice)
 
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
