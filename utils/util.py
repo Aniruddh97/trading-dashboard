@@ -25,7 +25,7 @@ def append_data(ohlc_obj_df, data_obj_df):
                     ohlc_obj_df[stock] = pd.concat([ohlc_obj_df[stock], pd.DataFrame([row])], ignore_index=True)
                 elif recent_live_date == recent_db_date:
                     db_index = ohlc_obj_df[stock].index[ohlc_obj_df[stock]['DATE'] == recent_db_date].tolist()[0]
-                    ohlc_obj_df[stock].loc[db_index, ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']] = [row.OPEN, row.HIGH, row.LOW, row.CLOSE, row.VOLUME]
+                    ohlc_obj_df[stock].loc[db_index, ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']] = [row['OPEN'], row['HIGH'], row['LOW'], row['CLOSE'], row['VOLUME']]
             latestData[stock] = ohlc_obj_df[stock]
         except:
             latestData[stock] = ohlc_obj_df[stock]

@@ -78,19 +78,19 @@ def bhavcopy_stock_range(start_date, end_date):
             os.remove(path)
 
             for index, row in data.iterrows():
-                if row.SYMBOL not in tickerList:
+                if row['SYMBOL'] not in tickerList:
                     continue
 
-                if row.SYMBOL not in stockData:
-                    stockData[row.SYMBOL] = []
+                if row['SYMBOL'] not in stockData:
+                    stockData[row['SYMBOL']] = []
                 
-                stockData[row.SYMBOL].append({
+                stockData[row['SYMBOL']].append({
                     "DATE": current_date,
-                    "OPEN": row.OPEN,
-                    "HIGH": row.HIGH,
-                    "LOW": row.LOW,
-                    "CLOSE": row.CLOSE,
-                    "VOLUME": row.TOTTRDQTY,
+                    "OPEN": row['OPEN'],
+                    "HIGH": row['HIGH'],
+                    "LOW": row['LOW'],
+                    "CLOSE": row['CLOSE'],
+                    "VOLUME": row['TOTTRDQTY'],
                 })
         except Exception as e:
             st.toast(str(e))
