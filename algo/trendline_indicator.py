@@ -82,11 +82,12 @@ class TrendlineIndicator(Indicator):
 
         order = {
             "valid": False,
+            "signal": None,
             "candleIndex": candleIndex,
             "proximity": self.proximity,
             "stop_loss": None,
             "target": None,
-            "strike_price": close
+            "strike_price": close,
         }
 
         # proximity threshold

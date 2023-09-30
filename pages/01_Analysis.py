@@ -34,12 +34,18 @@ with st.form("Indice Selection"):
                         if patternRecognition:
                             pattern, rank = getLatestCandlePattern(df, all=True)
                             
-                        ind = getIndicators(data=df, ticker=ticker, pattern=pattern)[0]
+                        indicatorCollection = getIndicators(data=df, ticker=ticker, pattern=pattern)
+                        primaryIndicator = indicatorCollection[0]
 
                         candleIndex = df.index.stop-1
                         analysis['data'][ticker] = {}
-                        analysis['data'][ticker]['indicator'] = ind.getIndicator(candleIndex)
-                        order = ind.getOrder(candleIndex)
+                        analysis['data'][ticker]['indicator'] = primaryIndicator.getIndicator(candleIndex)
+
+                        signalCollection = {}
+                        for ind in indicatorCollection:
+                            signalCollection[ind.__class__.__name__] = ind.getOrder(candleIndex)["signal"]
+
+                        order = primaryIndicator.getOrder(candleIndex)
                         analysis['rank'].append({
                             'Ticker': ticker,
                             'Signal': order["signal"],
@@ -47,6 +53,7 @@ with st.form("Indice Selection"):
                             'Pattern Rank': rank,
                             'Proximity %': order["proximity"],
                             'Volume Up %': round((df.VOLUME[candleIndex]-df.VOLUME[candleIndex-1])/df.VOLUME[candleIndex-1], 2)*100,
+                            **signalCollection
                         })
                     except Exception as e:
                         print(e)

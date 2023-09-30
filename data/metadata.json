@@ -5105,11 +5105,12 @@
         "candle_count": 120,
         "chart_height": 550,
         "indicator": [
-            "S&R"
+            "S&R",
+            "EMA"
         ],
         "pattern_filter": [],
         "pattern_recognition": true,
-        "pivot_window": 21,
+        "pivot_window": 31,
         "slider": true,
         "sort_by": "Signal",
         "wide_layout": true
