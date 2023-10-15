@@ -48,7 +48,8 @@ else:
 	df = most_recent_data(tickers=[randomTicker], progress=False)[randomTicker]
 	randomIndex = st.session_state['quiz']['randomIndex']
 
-pattern, rank = getLatestCandlePattern(df[0:randomIndex+1], all=True)
+# pattern, rank = getLatestCandlePattern(df[0:randomIndex+1], all=True)
+pattern = ' '.join(getCandlestickPatterns(df[0:randomIndex+1], candleIndex=randomIndex))
 ind = getIndicators(data=df, ticker=randomTicker, pattern=pattern)[0]
 st.plotly_chart(ind.getIndicator(randomIndex), use_container_width=True)
 
