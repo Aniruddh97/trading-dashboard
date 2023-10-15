@@ -2,6 +2,7 @@ from utils import *
 from .snr_indicator import *
 from .trendline_indicator import *
 from .moving_average_indicator import *
+from .cds_pattern_indicator import *
 
 def getIndicators(data, ticker='', pattern=''):
     indicatorSetting = getIndicatorSetting()
@@ -15,6 +16,9 @@ def getIndicators(data, ticker='', pattern=''):
     
     if 'Trendline' in indicatorSetting:
         indicators.append(TrendlineIndicator(data=data, tickerName=ticker, patternTitle=pattern))
+    
+    if 'CandlestickPattern' in indicatorSetting:
+        indicators.append(CandlestickPatternIndicator(data=data, tickerName=ticker, patternTitle=pattern))
 
     # default
     if len(indicators) == 0:

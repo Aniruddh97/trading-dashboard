@@ -11,7 +11,7 @@ def getCandlePatternList(all=False):
     return talib.get_function_groups()['Pattern Recognition']
 
 
-def getCandlestickPattern(df, candleIndex):
+def getCandlestickPatterns(df, candleIndex):
 
     if (candleIndex - 15) < df.index.start or candleIndex > (df.index.stop - 1):
         return ['NO_PATTERN']
@@ -44,14 +44,14 @@ def getLatestCandlePattern(df, all=False):
     
     df = df.tail(15).copy(deep=True)
     df = df.reset_index(drop=True)
-    df = recognizePattern(df, all)
+    df = getBestCandlestickPattern(df, all)
     pattern = df['candlestick_pattern'][df.index.stop-1]
     rank = candle_rankings[pattern]
     
     return pattern, rank
 
 
-def recognizePattern(df, all=False):
+def getBestCandlestickPattern(df, all=False):
     """
     Recognizes candlestick patterns and appends 2 additional columns to df;
     1st - Best Performance candlestick pattern matched by www.thepatternsite.com
@@ -128,66 +128,46 @@ def recognizePattern(df, all=False):
 
 candle_rankings = {
         "NO_PATTERN": 999,
+        "CDLMATCHINGLOW_Bull": 0.5,
+        "CDLHOMINGPIGEON_Bull": 0.8,
         "CDL3LINESTRIKE_Bull": 1,
         "CDL3LINESTRIKE_Bear": 2,
-        "CDL3BLACKCROWS_Bull": 3,
         "CDL3BLACKCROWS_Bear": 3,
-        "CDLEVENINGSTAR_Bull": 4,
         "CDLEVENINGSTAR_Bear": 4,
         "CDLTASUKIGAP_Bull": 5,
         "CDLTASUKIGAP_Bear": 5,
         "CDLINVERTEDHAMMER_Bull": 6,
-        "CDLINVERTEDHAMMER_Bear": 6,
-        "CDLMATCHINGLOW_Bull": 7,
-        "CDLMATCHINGLOW_Bear": 7,
         "CDLABANDONEDBABY_Bull": 8,
-        "CDLABANDONEDBABY_Bear": 8,
         "CDLBREAKAWAY_Bull": 10,
         "CDLBREAKAWAY_Bear": 10,
         "CDLMORNINGSTAR_Bull": 12,
-        "CDLMORNINGSTAR_Bear": 12,
         "CDLPIERCING_Bull": 13,
-        "CDLPIERCING_Bear": 13,
         "CDLSTICKSANDWICH_Bull": 14,
-        "CDLSTICKSANDWICH_Bear": 14,
-        "CDLTHRUSTING_Bull": 15,
         "CDLTHRUSTING_Bear": 15,
-        "CDLINNECK_Bull": 17,
         "CDLINNECK_Bear": 17,
         "CDL3INSIDE_Bull": 20,
         "CDL3INSIDE_Bear": 56,
-        "CDLHOMINGPIGEON_Bull": 21,
-        "CDLHOMINGPIGEON_Bear": 21,
-        "CDLDARKCLOUDCOVER_Bull": 22,
         "CDLDARKCLOUDCOVER_Bear": 22,
-        "CDLIDENTICAL3CROWS_Bull": 24,
         "CDLIDENTICAL3CROWS_Bear": 24,
         "CDLMORNINGDOJISTAR_Bull": 25,
-        "CDLMORNINGDOJISTAR_Bear": 25,
         "CDLXSIDEGAP3METHODS_Bull": 27,
         "CDLXSIDEGAP3METHODS_Bear": 26,
         "CDLTRISTAR_Bull": 28,
         "CDLTRISTAR_Bear": 76,
         "CDLGAPSIDESIDEWHITE_Bull": 46,
         "CDLGAPSIDESIDEWHITE_Bear": 29,
-        "CDLEVENINGDOJISTAR_Bull": 30,
         "CDLEVENINGDOJISTAR_Bear": 30,
         "CDL3WHITESOLDIERS_Bull": 32,
-        "CDL3WHITESOLDIERS_Bear": 32,
-        "CDLONNECK_Bull": 33,
         "CDLONNECK_Bear": 33,
         "CDL3OUTSIDE_Bull": 34,
         "CDL3OUTSIDE_Bear": 39,
         "CDLRICKSHAWMAN_Bull": 35,
-        "CDLRICKSHAWMAN_Bear": 35,
         "CDLSEPARATINGLINES_Bull": 36,
         "CDLSEPARATINGLINES_Bear": 40,
         "CDLLONGLEGGEDDOJI_Bull": 37,
-        "CDLLONGLEGGEDDOJI_Bear": 37,
-        "CDLHARAMI_Bull": 38,
+        "CDLHARAMI_Bull": 0.6,
         "CDLHARAMI_Bear": 72,
         "CDLLADDERBOTTOM_Bull": 41,
-        "CDLLADDERBOTTOM_Bear": 41,
         "CDLCLOSINGMARUBOZU_Bull": 70,
         "CDLCLOSINGMARUBOZU_Bear": 43,
         "CDLTAKURI_Bull": 47,

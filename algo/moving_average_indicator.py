@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from .indicator import Indicator
 from plotly.subplots import make_subplots
 from utils import getChartHeight, getCandleCount, getPivotWindow
-from .candlestick_patterns import getCandlestickPattern
+from .candlestick_patterns import getCandlestickPatterns
 
 
 class MovingAverageIndicator(Indicator):
