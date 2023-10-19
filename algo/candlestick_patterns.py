@@ -131,6 +131,7 @@ candle_rankings = {
         "CDLMATCHINGLOW_Bull": 0.5,
         "CDLHARAMI_Bull": 0.6,
         "CDLHOMINGPIGEON_Bull": 0.7,
+        "CDLDRAGONFLYDOJI_Bull": 0.8,
         "CDL3LINESTRIKE_Bull": 1,
         "CDL3LINESTRIKE_Bear": 2,
         "CDL3BLACKCROWS_Bear": 3,
@@ -200,7 +201,6 @@ candle_rankings = {
         "CDLHANGINGMAN_Bear": 87,
         "CDLRISEFALL3METHODS_Bull": 94,
         "CDLRISEFALL3METHODS_Bear": 89,
-        "CDLDRAGONFLYDOJI_Bull": 98,
         "CDL3STARSINSOUTH_Bull": 103,
         "CDLDOJI_Bull": 104,
     }
