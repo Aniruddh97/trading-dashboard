@@ -47,9 +47,10 @@ class CandlestickPatternIndicator(Indicator):
         if start < 0:
             start = 0
         dfSlice = self.df[start:candleIndex+1]
-
+        
+        pattern = ' | '.join(self.patternDict[candleIndex])
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-               vertical_spacing=0.05, subplot_titles=(self.tickerName, self.patternTitle), 
+               vertical_spacing=0.05, subplot_titles=(self.tickerName, pattern), 
                row_width=[0.2, 0.7])
         
         # draw candlestick
