@@ -104,7 +104,7 @@ def getSortBySetting():
 	if meta['settings']['sort_by'] == 'Signal':
 		return 'Signal', False
 	
-	return 'Volume Up %', False
+	return 'None', False
 
 
 def getFilterBySetting():

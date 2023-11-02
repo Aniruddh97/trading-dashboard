@@ -70,7 +70,8 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
     rank = pd.DataFrame(st.session_state['analysis']['rank'])
     
     sort, order = getSortBySetting()
-    rank = rank.sort_values(by=sort, ascending=order).reset_index(drop=True)
+    if sort != 'None':
+        rank = rank.sort_values(by=sort, ascending=order).reset_index(drop=True)
     
     filter = getFilterBySetting()
     if len(filter) > 0:

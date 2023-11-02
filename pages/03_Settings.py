@@ -35,7 +35,7 @@ with st.form('Configure settings'):
     inds = getIndicatorSetting()
     indicator = st.multiselect('Indicator', options=indArray, default=inds)
     
-    sortArray = ['Proximity %', 'Pattern Rank', 'Volume Up %', 'Signal']
+    sortArray = ['None', 'Proximity %', 'Pattern Rank', 'Volume Up %', 'Signal']
     sortby, _ = getSortBySetting()
     sortby = st.selectbox('Sort By', sortArray, index=sortArray.index(sortby))
 
