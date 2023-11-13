@@ -5197,16 +5197,16 @@
     },
     "last_sync_date": "2023-10-15",
     "settings": {
-        "candle_count": 120,
+        "candle_count": 90,
         "chart_height": 550,
         "indicator": [
-            "CandlestickPattern"
+            "S&R"
         ],
         "pattern_filter": [],
         "pattern_recognition": true,
-        "pivot_window": 31,
+        "pivot_window": 11,
         "slider": true,
-        "sort_by": "Pattern Rank",
+        "sort_by": "None",
         "wide_layout": true
     },
     "watchlist": [
