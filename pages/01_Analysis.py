@@ -93,7 +93,7 @@ if 'analysis' in st.session_state and 'rank' in st.session_state['analysis']:
                 addToWatchlist(ticker=ticker)
         else:
             for ticker in paginate(datalist=rank.Ticker.to_list(), limit_per_page=10):
-                chartContainer.plotly_chart(indicator_obj[ticker], use_container_width=True)
+                chartContainer.plotly_chart(indicator_obj[ticker]['indicator'], use_container_width=True)
                 if chartContainer.button(f'Add `{ticker}` to watchlist'):
                     addToWatchlist(ticker=ticker)
     
