@@ -15,7 +15,7 @@ class SupportResistanceIndicator(Indicator):
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
-        self.df["SMA200"] = talib.SMA(data.CLOSE, timeperiod=200)
+        self.df["EMA"] = ta.ema(data.CLOSE, length=self.emaWindow)
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
@@ -37,7 +37,7 @@ class SupportResistanceIndicator(Indicator):
     
     
     def drawSMA(self, fig, dfSlice):
-        fig.add_scatter(x=dfSlice.index, y=dfSlice.SMA200, line=dict(color="aliceblue", width=0.25), name="200 SMA", row=1, col=1),
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA, line=dict(color="aliceblue", width=0.25), name=f"{self.emaWindow}EMA", row=1, col=1),
         return fig
 
     

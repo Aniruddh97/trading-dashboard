@@ -13,8 +13,8 @@ class MovingAverageIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
-        self.df["EMA"] = ta.ema(data.CLOSE, length=self.window)
-        self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
+        self.df["EMA"] = ta.ema(data.CLOSE, length=self.emaWindow)
+        self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.emaWindow)
 
 
     def drawEMA(self, fig, dfSlice):

@@ -5199,8 +5199,9 @@
     "settings": {
         "candle_count": 90,
         "chart_height": 550,
+        "ema_window": 50,
         "indicator": [
-            "S&R"
+            "EMA"
         ],
         "pattern_filter": [],
         "pattern_recognition": true,

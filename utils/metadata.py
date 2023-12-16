@@ -54,6 +54,17 @@ def getPivotWindow():
 	return int(meta['settings']['pivot_window'])
 
 
+def getEMAWindow():
+	meta = readJSON()
+	if 'settings' not in meta:
+		return 11
+	
+	if 'ema_window' not in meta['settings']:
+		return 11
+	
+	return int(meta['settings']['ema_window'])
+
+
 def getChartHeight():
 	meta = readJSON()
 	if 'settings' not in meta:

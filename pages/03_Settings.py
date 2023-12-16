@@ -25,6 +25,9 @@ with st.form('Configure settings'):
     window = getPivotWindow()
     pivot_window = st.number_input("Window", value=window, min_value=11, max_value=200)
     
+    emaWindow = getEMAWindow()
+    ema_window = st.number_input("EMA Window", value=emaWindow, min_value=5, max_value=200)
+    
     candles = getCandleCount()
     candle_count = st.number_input("Candle Count", value=candles, min_value=50, max_value=240)
     
@@ -52,6 +55,7 @@ with st.form('Configure settings'):
         meta['settings']['sort_by'] = sortby
         meta['settings']['candle_count'] = candle_count
         meta['settings']['pivot_window'] = int(pivot_window)
+        meta['settings']['ema_window'] = int(ema_window)
         meta['settings']['pattern_filter'] = patternFilter
         meta['settings']['indicator'] = indicator
         meta['settings']['pattern_recognition'] = doPatternRecognition

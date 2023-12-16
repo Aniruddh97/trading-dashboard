@@ -11,6 +11,7 @@ class Indicator():
         self.window = getPivotWindow()
         self.tickerName = tickerName
         self.patternTitle = patternTitle
+        self.emaWindow = getEMAWindow()
 
 
     def getFullCandleChart(self, candleIndex=None):
