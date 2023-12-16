@@ -26,6 +26,10 @@ with st.form('Remove to watchlist'):
     if submitted:
         removeFromWatchlist(ticker=ticker)
 
+if st.button("Clear Watchlist"):
+	meta['watchlist'] = []
+	writeJSON(meta)
+
 watchlist = meta['watchlist']
 if len(watchlist) > 0:
     limit_per_page = 10

@@ -73,12 +73,17 @@ class MovingAverageIndicator(Indicator):
         # set proximity threshold
         proximityThreshold = 0.5
 
-        # bullish_patterns = ['CDLHAMMER_Bull', 'CDLENGULFING_Bull', 'CDLHARAMI_Bull', 'CDLCLOSINGMARUBOZU_Bull', 'CDLMARUBOZU_Bull']
-        if close > open and proximityLow < proximityThreshold and volume > prevVolume:
+        
+        if close > open and proximityLow < proximityThreshold:
             return 'BUY'
         
-        # bearish_patterns = ['CDLINVERTEDHAMMER_Bear', 'CDLENGULFING_Bear', 'CDLHARAMI_Bear', 'CDLCLOSINGMARUBOZU_Bear', 'CDLMARUBOZU_Bear']
-        if open > close and proximityHigh < proximityThreshold and volume > prevVolume:
+        if open > close and proximityHigh < proximityThreshold:
+            return 'SELL'
+
+        if open < ema and close > ema:
+            return 'BUY'
+        
+        if open > ema and close < ema:
             return 'SELL'
         
         return ''

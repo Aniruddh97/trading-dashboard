@@ -5206,8 +5206,8 @@
         "pattern_filter": [],
         "pattern_recognition": true,
         "pivot_window": 15,
-        "slider": false,
-        "sort_by": "None",
+        "slider": true,
+        "sort_by": "Signal",
         "wide_layout": true
     },
     "watchlist": []
