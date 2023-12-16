@@ -72,20 +72,22 @@ class MovingAverageIndicator(Indicator):
 
         # set proximity threshold
         proximityThreshold = 0.5
-
         
-        if close > open and proximityLow < proximityThreshold:
+		# slope of ema (rising/declining ema)
+        slope = (ema - self.df.EMA[candleIndex-self.emaWindow])/self.emaWindow
+        
+        if close > open and proximityLow < proximityThreshold and slope > 1:
             return 'BUY'
         
-        if open > close and proximityHigh < proximityThreshold:
+        if open > close and proximityHigh < proximityThreshold and slope < -1:
             return 'SELL'
 
-        if open < ema and close > ema:
+        if open < ema and close > ema and slope > 1:
             return 'BUY'
         
-        if open > ema and close < ema:
+        if open > ema and close < ema and slope < -1:
             return 'SELL'
-        
+
         return ''
     
 
