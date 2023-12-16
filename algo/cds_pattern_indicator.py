@@ -71,6 +71,18 @@ class CandlestickPatternIndicator(Indicator):
         return fig
     
 
+    def getSignal(self, candleIndex):
+        currentPatterns = self.patternDict[candleIndex]
+        if len(currentPatterns) > 0:
+            for pat in self.patterns:
+                if pat in currentPatterns:
+                    if 'Bull' in pat:
+                        return 'BUY'
+                    else:
+                        return 'SELL'
+        return ''
+
+
     def getOrder(self, candleIndex):
         open = self.df.OPEN[candleIndex]
         high = self.df.HIGH[candleIndex]
@@ -87,20 +99,17 @@ class CandlestickPatternIndicator(Indicator):
             "strike_price": close
         }
 
-        if len(self.patterns) == 0:
-            return order
+        signal = self.getSignal(candleIndex=candleIndex)        
         
-        currentPatterns = self.patternDict[candleIndex]
-        if len(currentPatterns) > 0 and set(self.patterns).issubset(set(currentPatterns)):
-            if 'Bull' in self.patterns[0]:
-                order["valid"] = True
-                order["signal"] = 'BUY'
-                order["stop_loss"] = low - atr
-                order["target"] = round(close + 2*(abs(close - order["stop_loss"])), 2)
-            else:
-                order["valid"] = True
-                order["signal"] = 'SELL'
-                order["stop_loss"] = high + atr
-                order["target"] = round(close - 2*(abs(close - order["stop_loss"])), 2)
-
+        if signal == 'BUY':
+            order["valid"] = True
+            order["signal"] = signal
+            order["stop_loss"] = low - atr
+            order["target"] = round(close + 2*(abs(close - order["stop_loss"])), 2)
+        elif signal == 'SELL':
+            order["valid"] = True
+            order["signal"] = signal
+            order["stop_loss"] = high + atr
+            order["target"] = round(close - 2*(abs(close - order["stop_loss"])), 2)
+        
         return order

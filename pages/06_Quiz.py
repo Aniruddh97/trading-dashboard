@@ -50,8 +50,8 @@ else:
 
 # pattern, rank = getLatestCandlePattern(df[0:randomIndex+1], all=True)
 pattern = ' '.join(getCandlestickPatterns(df[0:randomIndex+1], candleIndex=randomIndex))
-ind = getIndicators(data=df, ticker=randomTicker, pattern=pattern)[0]
-st.plotly_chart(ind.getIndicator(randomIndex), use_container_width=True)
+ind = getIndicators(data=df, ticker='Hidden', pattern=pattern)[0]
+st.plotly_chart(ind.getIndicator(randomIndex).update(layout_dragmode='drawrect'), use_container_width=True)
 
 if st.button("Next"):
 	del st.session_state['quiz']['ticker']

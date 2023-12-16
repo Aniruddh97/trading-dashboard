@@ -69,61 +69,35 @@ def backtest(ind, onlyResult = True):
         elif new_order['valid']:
             curr_order = new_order
 
-    return ind.tickerName, total_result, total_trades, fig
-
+    return {
+        'Ticker': ind.tickerName,
+        'Total' : total_result,
+        'Trades': total_trades,
+        'Fig': fig
+    }
 
 with st.form("Indice Selection"):
     meta = readJSON(METADATA_FILE_PATH)
-    category = st.selectbox('Select Ticker', meta['LIST'])
+    category = st.selectbox('Select Ticker', meta['LIST']['INDICES'])
     onlyResult = st.checkbox('Only result', value=True)
     submitted = st.form_submit_button("Backtest")
     if submitted:
         
         olhc_df_dict = load_db_data(tickers=meta['LIST'][category])
+        results = []
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        i = 0
+        pbar = st.progress(0, text=f"Backtesting...")
+        for ticker in meta['LIST'][category]:
+            pbar.progress(int((i)*(100/len(meta['LIST'][category]))), text=f"Backtesting {ticker}")
+            i += 1
             
-            futures = [executor.submit(getIndicators, olhc_df_dict[ticker], ticker) for ticker in meta['LIST'][category]]
-            indicatorArray = [future.result() for future in concurrent.futures.as_completed(futures)]
-            
-            indicators = [arr[0] for arr in indicatorArray]
+            ind = getIndicators(data=olhc_df_dict[ticker], ticker=ticker)
 
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            shortlisted = []
-            for pattern in candle_rankings.keys():
-                for ind in indicators:
-                    ind.patterns = [pattern]
-                
-                futures = [executor.submit(backtest, ind, onlyResult) for ind in indicators]
-                results = [future.result() for future in concurrent.futures.as_completed(futures)]
-            
-                final_result = []
-                wins = 0
-                loss = 0
-                for result in results:
-                    final_result.append({
-                        'Ticker': result[0],
-                        'PnL': result[1],
-                        'Trades': result[2],
-                        'Pattern': pattern
-                    })
-                    if result[1] < 0:
-                        loss += 1
-                    elif result[1] > 0:
-                        wins += 1
-                    
-                if (wins > 0 or loss > 0) and wins*100/(loss+wins) >= 67:
-                    shortlisted.append({
-                        "Pattern": pattern,
-                        "Wins": wins,
-                        "Loss": loss
-                    })
-
-                st.write(f"{pattern} | Wins : {wins} | Loss : {loss}")
-                # st.write(pd.DataFrame(final_result))
-                # st.divider()
-        meta = readJSON()
-        meta['Backtest Result'] = shortlisted
-        writeJSON(meta)
-        st.write(shortlisted)
+            result = backtest(ind[0], onlyResult)
+            results.append(result)
+        pbar.progress(100, text=f"Backtesting complete")
+    
+        df = pd.DataFrame(results)
+        st.write(df)
+        st.write(f"Net Total : {round(df['Total'].sum(), 2)}")

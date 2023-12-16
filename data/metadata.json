@@ -1,96 +1,5 @@
 {
-    "Backtest Result": [
-        {
-            "Loss": 1,
-            "Pattern": "CDLMATCHINGLOW_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 2,
-            "Pattern": "CDLMORNINGSTAR_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLPIERCING_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDL3INSIDE_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 3,
-            "Pattern": "CDL3OUTSIDE_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 0,
-            "Pattern": "CDLRICKSHAWMAN_Bull",
-            "Wins": 10
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLLONGLEGGEDDOJI_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLHARAMI_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLCLOSINGMARUBOZU_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 3,
-            "Pattern": "CDLTAKURI_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 3,
-            "Pattern": "CDLDOJISTAR_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 2,
-            "Pattern": "CDLHARAMICROSS_Bull",
-            "Wins": 8
-        },
-        {
-            "Loss": 0,
-            "Pattern": "CDLBELTHOLD_Bull",
-            "Wins": 10
-        },
-        {
-            "Loss": 3,
-            "Pattern": "CDLHIGHWAVE_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLSPINNINGTOP_Bull",
-            "Wins": 9
-        },
-        {
-            "Loss": 2,
-            "Pattern": "CDLHIKKAKE_Bull",
-            "Wins": 8
-        },
-        {
-            "Loss": 3,
-            "Pattern": "CDLENGULFING_Bull",
-            "Wins": 7
-        },
-        {
-            "Loss": 1,
-            "Pattern": "CDLDOJI_Bull",
-            "Wins": 9
-        }
-    ],
+    "Backtest Result": [],
     "Holidays": [
         "2023-01-26",
         "2023-02-18",
@@ -5197,7 +5106,7 @@
     },
     "last_sync_date": "2023-10-15",
     "settings": {
-        "candle_count": 90,
+        "candle_count": 70,
         "chart_height": 550,
         "ema_window": 50,
         "indicator": [
@@ -5207,7 +5116,7 @@
         "pattern_recognition": true,
         "pivot_window": 15,
         "slider": true,
-        "sort_by": "Signal",
+        "sort_by": "Pattern Rank",
         "wide_layout": true
     },
     "watchlist": []

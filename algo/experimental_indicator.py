@@ -9,18 +9,12 @@ from utils import getChartHeight, getCandleCount, getPivotWindow
 from .candlestick_patterns import getCandlestickPatterns
 
 
-class MovingAverageIndicator(Indicator):
+class ExperimentalIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
-        self.df["EMA"] = ta.ema(data.CLOSE, length=self.emaWindow)
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.emaWindow)
 
-
-    def drawEMA(self, fig, dfSlice):
-        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA, line=dict(color="yellow", width=2), name="EMA", row=1, col=1),
-        return fig
-    
 
     def getIndicator(self, candleIndex):
         start = candleIndex-getCandleCount()
@@ -45,9 +39,6 @@ class MovingAverageIndicator(Indicator):
         if 'VOLUME' in dfSlice:
             fig.add_trace(go.Bar(x=dfSlice.index, y=dfSlice.VOLUME, showlegend=False), row=2, col=1)
 
-        # draw EMA
-        fig = self.drawEMA(fig=fig, dfSlice=dfSlice)
-            
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
         fig.update(layout_height=getChartHeight())
@@ -57,35 +48,14 @@ class MovingAverageIndicator(Indicator):
 
     def getSignal(self, candleIndex):
         open = self.df.OPEN[candleIndex]
-        high = self.df.HIGH[candleIndex]
-        low = self.df.LOW[candleIndex]
         close = self.df.CLOSE[candleIndex]
-        ema = self.df.EMA[candleIndex]
         prevVolume = self.df.VOLUME[candleIndex-1]
         volume = self.df.VOLUME[candleIndex]
-        # patterns = getCandlestickPattern(df=self.df, candleIndex=candleIndex)
-        # st.dataframe(patterns)
-        proximityLow = round((abs(low-ema)/ema)*100, 2)
-        proximityHigh = round((abs(high-ema)/ema)*100, 2)
-        proximity = min(proximityHigh, proximityLow)
-        self.proximity = proximity
-
-        # set proximity threshold
-        proximityThreshold = 0.5
         
-		# slope of ema (rising/declining ema)
-        slope = (ema - self.df.EMA[candleIndex-self.emaWindow])/self.emaWindow
-        
-        if close > open and proximityLow < proximityThreshold and slope > 1:
+        if close > open and volume > prevVolume:
             return 'BUY'
         
-        if open > close and proximityHigh < proximityThreshold and slope < -1:
-            return 'SELL'
-
-        if open < ema and close > ema and slope > 1:
-            return 'BUY'
-        
-        if open > ema and close < ema and slope < -1:
+        if open > close and volume > prevVolume:
             return 'SELL'
 
         return ''
@@ -93,7 +63,11 @@ class MovingAverageIndicator(Indicator):
 
     def getOrder(self, candleIndex):
         close = self.df.CLOSE[candleIndex]
-        ema = self.df.EMA[candleIndex]
+        high = self.df.HIGH[candleIndex]
+        prevHigh = self.df.HIGH[candleIndex-1]
+        low = self.df.LOW[candleIndex]
+        prevLow = self.df.LOW[candleIndex-1]
+        
         atr = self.df.ATR[candleIndex]
         volume = self.df.VOLUME[candleIndex]
         prevVolume = self.df.VOLUME[candleIndex-1]
@@ -103,7 +77,7 @@ class MovingAverageIndicator(Indicator):
             "valid": False,
             "signal": signal,
             "candleIndex": candleIndex,
-            "proximity": self.proximity,
+            "proximity": 0,
             "stop_loss": None,
             "target": None,
             "strike_price": close
@@ -111,11 +85,11 @@ class MovingAverageIndicator(Indicator):
         
         if signal == 'BUY':
             order["valid"] = True
-            order["stop_loss"] = round(ema - 1.5*atr, 2)
+            order["stop_loss"] = round(min(low, prevLow) - 1.5*atr, 2)
             order["target"] = close + 1.5 * (close - order["stop_loss"])
         elif signal == 'SELL':
             order["valid"] = True
-            order["stop_loss"] = round(ema + 1.5*atr, 2)
+            order["stop_loss"] = round(max(high, prevHigh) + 1.5*atr, 2)
             order["target"] = close - 1.5 * (order["stop_loss"] - close)
             
         return order
