@@ -75,22 +75,22 @@ if 'study_ticker' in st.session_state:
                 new_position = 'LONG' if new_order['target'] > new_order['strike_price'] else 'SHORT'
                 if curr_position == new_position:
                     pass
-                else:
-                    # square-off current position
-                    if curr_position == 'LONG':
-                        result = df.CLOSE[candleIndex]-curr_order['strike_price']
-                        st.session_state['study_result'] += result 
-                    else:
-                        result = (curr_order['strike_price']-df.CLOSE[candleIndex])
-                        st.session_state['study_result'] += result
+                # else:
+                #     # square-off current position
+                #     if curr_position == 'LONG':
+                #         result = df.CLOSE[candleIndex]-curr_order['strike_price']
+                #         st.session_state['study_result'] += result 
+                #     else:
+                #         result = (curr_order['strike_price']-df.CLOSE[candleIndex])
+                #         st.session_state['study_result'] += result
                     
-                    # take new position
-                    st.session_state['study_order'] = new_order
+                #     # take new position
+                #     st.session_state['study_order'] = new_order
 
-                    if result > 0:
-                        st.balloons()
-                    else:
-                        st.snow()
+                #     if result > 0:
+                #         st.balloons()
+                #     else:
+                #         st.snow()
 
     elif new_order['valid']:
         st.session_state['study_order'] = new_order

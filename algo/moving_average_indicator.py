@@ -18,7 +18,7 @@ class MovingAverageIndicator(Indicator):
 
 
     def drawEMA(self, fig, dfSlice):
-        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA, line=dict(color="yellow", width=2), name="EMA", row=1, col=1),
+        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA, line=dict(color="yellow", width=2), name="EMA", row=1, col=1)
         return fig
     
 

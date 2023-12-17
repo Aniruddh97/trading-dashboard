@@ -5110,13 +5110,13 @@
         "chart_height": 550,
         "ema_window": 50,
         "indicator": [
-            "EMA"
+            "HaramiBreakout"
         ],
         "pattern_filter": [],
         "pattern_recognition": true,
-        "pivot_window": 15,
-        "slider": true,
-        "sort_by": "Pattern Rank",
+        "pivot_window": 21,
+        "slider": false,
+        "sort_by": "Signal",
         "wide_layout": true
     },
     "watchlist": []

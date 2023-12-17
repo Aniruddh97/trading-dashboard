@@ -27,8 +27,8 @@ with st.form('Remove to watchlist'):
         removeFromWatchlist(ticker=ticker)
 
 if st.button("Clear Watchlist"):
-	meta['watchlist'] = []
-	writeJSON(meta)
+    meta['watchlist'] = []
+    writeJSON(meta)
 
 watchlist = meta['watchlist']
 if len(watchlist) > 0:
@@ -52,8 +52,11 @@ if len(watchlist) > 0:
     chartContainer = st.container()
     
     if useSlider():
-        chartIndex = st.slider('', min_value=0, max_value=len(st.session_state['watchlist'])-1)
-        ticker, chart = st.session_state['watchlist'][chartIndex]
+        if len(st.session_state['watchlist']) == 1:
+            ticker, chart = st.session_state['watchlist'][0]
+        else:
+            chartIndex = st.slider('', min_value=0, max_value=len(st.session_state['watchlist'])-1)
+            ticker, chart = st.session_state['watchlist'][chartIndex]
         chartContainer.plotly_chart(chart, use_container_width=True)
         if chartContainer.button(f'Remove `{ticker}` from watchlist'):
             removeFromWatchlist(ticker=ticker)

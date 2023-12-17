@@ -5,18 +5,19 @@ import pandas as pd
 import pandas_ta as ta
 import plotly.graph_objects as go
 
+from itertools import compress
 from .indicator import Indicator
 from plotly.subplots import make_subplots
 from .candlestick_patterns import getCandlestickPatterns
-from utils import getPivotWindow, getCandleCount, getChartHeight
+from utils import getCandleCount, getChartHeight, getFilterBySetting
 
 
-class SupportResistanceIndicator(Indicator):
+class HaramiBreakoutIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
+        self.patterns = getFilterBySetting()
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
-        self.df["EMA"] = ta.ema(data.CLOSE, length=self.emaWindow)
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
@@ -36,12 +37,7 @@ class SupportResistanceIndicator(Indicator):
 
         return filteredLevels
     
-    
-    def drawSMA(self, fig, dfSlice):
-        fig.add_scatter(x=dfSlice.index, y=dfSlice.EMA, line=dict(color="aliceblue", width=0.25), name=f"{self.emaWindow}EMA", row=1, col=1),
-        return fig
 
-    
     def drawLevels(self, fig, dfSlice, candleIndex):
         levels = self.getLevels(candleIndex)
 
@@ -75,9 +71,9 @@ class SupportResistanceIndicator(Indicator):
         if start < 0:
             start = 0
         dfSlice = self.df[start:candleIndex+1]
-
+        
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-               vertical_spacing=0.05, subplot_titles=(self.tickerName, self.patternTitle), 
+               vertical_spacing=0.05, subplot_titles=(self.tickerName, '-'), 
                row_width=[0.2, 0.7])
         
         # draw candlestick
@@ -94,9 +90,6 @@ class SupportResistanceIndicator(Indicator):
         # draw levels
         fig = self.drawLevels(fig=fig, dfSlice=dfSlice, candleIndex=candleIndex)
 
-        # draw sma
-        fig = self.drawSMA(fig=fig, dfSlice=dfSlice)
-
         fig.update(layout_xaxis_rangeslider_visible=False)
         fig.update(layout_showlegend=False)
         fig.update(layout_height=getChartHeight())
@@ -105,42 +98,47 @@ class SupportResistanceIndicator(Indicator):
     
 
     def getSignal(self, candleIndex):
-        open = self.df.OPEN[candleIndex]
-        high = self.df.HIGH[candleIndex]
-        low = self.df.LOW[candleIndex]
-        close = self.df.CLOSE[candleIndex]
+        pprevopen = self.df.OPEN[candleIndex-2]
+        pprevclose = self.df.CLOSE[candleIndex-2]
         
-        supports = []
-        resistances = []
-        levels = self.getLevels(candleIndex=candleIndex)
-        for level in levels:
-            if level > high:
-                resistances.append(level)
-            elif level < low:
-                supports.append(level)
+        prevopen = self.df.OPEN[candleIndex-1]
+        prevclose = self.df.CLOSE[candleIndex-1]
+        
+        curopen = self.df.OPEN[candleIndex]
+        curclose = self.df.CLOSE[candleIndex]
+        
+        harami = False
 
-        proximityThreshold = 0.75
-
-        if len(supports) > 0:
-            closestSupport = max(supports)
-            proximitySupport = (abs(low - closestSupport))*100/low
-            if close > open and proximitySupport < proximityThreshold:
+        if pprevopen < pprevclose:
+            if prevopen < prevclose:
+                if prevopen < pprevopen and prevclose < pprevclose:
+                    harami = True
+            elif prevopen > prevclose:
+                if prevopen < pprevclose and prevclose > pprevopen:
+                    harami = True
+        elif pprevopen > pprevclose:
+            if prevopen > prevclose:
+                if prevopen < pprevopen and prevclose > pprevclose:
+                    harami = True
+            elif prevopen < prevclose:
+                if prevclose < pprevopen and prevopen > pprevclose:
+                    harami = True
+        
+        if harami:
+            if prevclose > prevopen and curclose > curopen and curclose > prevclose:
                 return 'BUY'
-        
-        if len(resistances) > 0:
-            closestResistance = min(resistances)
-            proximityResistance = (abs(closestResistance - high))*100/closestResistance
-            if open > close and proximityResistance < proximityThreshold:
+            elif prevclose < prevopen and curclose < curopen and curclose < prevclose:
                 return 'SELL'
 
         return ''
 
-        
-    
+
     def getOrder(self, candleIndex):
+        open = self.df.OPEN[candleIndex]
         high = self.df.HIGH[candleIndex]
         low = self.df.LOW[candleIndex]
         close = self.df.CLOSE[candleIndex]
+        atr = self.df.ATR[candleIndex]
         order = {
             "valid": False,
             "signal": "",
@@ -151,20 +149,17 @@ class SupportResistanceIndicator(Indicator):
             "strike_price": close
         }
 
-        atr = self.df.ATR[candleIndex]
-        signal = self.getSignal(candleIndex)
-
+        signal = self.getSignal(candleIndex=candleIndex)        
+        
         if signal == 'BUY':
             order["valid"] = True
-            order["signal"] = 'BUY'
+            order["signal"] = signal
             order["stop_loss"] = low - atr
-            order["target"] = round(close + 1.5*(abs(close - order["stop_loss"])), 2)
-            order["proximity"] = None
+            order["target"] = round(close + 2*(abs(close - order["stop_loss"])), 2)
         elif signal == 'SELL':
             order["valid"] = True
-            order["signal"] = 'SELL'
+            order["signal"] = signal
             order["stop_loss"] = high + atr
-            order["target"] = round(close - 1.5*(abs(close - order["stop_loss"])), 2)
-            order["proximity"] = None
-
+            order["target"] = round(close - 2*(abs(close - order["stop_loss"])), 2)
+        
         return order

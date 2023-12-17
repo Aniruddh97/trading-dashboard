@@ -52,19 +52,19 @@ def backtest(ind, onlyResult = True):
                     new_position = 'LONG' if new_order['target'] > new_order['strike_price'] else 'SHORT'
                     if curr_position == new_position:
                         pass
-                    else:
-                        # square-off current position
-                        if curr_position == 'LONG':
-                            result = df.CLOSE[candleIndex]-curr_order['strike_price']
-                            total_result += result 
-                            total_trades += 1
-                        else:
-                            result = (curr_order['strike_price']-df.CLOSE[candleIndex])
-                            total_result += result
-                            total_trades += 1
+                    # else:
+                    #     # square-off current position
+                    #     if curr_position == 'LONG':
+                    #         result = df.CLOSE[candleIndex]-curr_order['strike_price']
+                    #         total_result += result 
+                    #         total_trades += 1
+                    #     else:
+                    #         result = (curr_order['strike_price']-df.CLOSE[candleIndex])
+                    #         total_result += result
+                    #         total_trades += 1
                         
-                        # take new position
-                        curr_order = new_order
+                    #     # take new position
+                    #     curr_order = new_order
 
         elif new_order['valid']:
             curr_order = new_order

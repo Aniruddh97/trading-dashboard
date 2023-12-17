@@ -9,7 +9,7 @@ from utils import getChartHeight, getCandleCount, getPivotWindow
 from .candlestick_patterns import getCandlestickPatterns
 
 
-class ExperimentalIndicator(Indicator):
+class MACrossoverIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
