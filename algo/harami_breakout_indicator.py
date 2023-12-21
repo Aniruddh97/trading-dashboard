@@ -102,6 +102,8 @@ class HaramiBreakoutIndicator(Indicator):
         pprevclose = self.df.CLOSE[candleIndex-2]
         
         prevopen = self.df.OPEN[candleIndex-1]
+        prevhigh = self.df.HIGH[candleIndex-1]
+        prevlow = self.df.LOW[candleIndex-1]
         prevclose = self.df.CLOSE[candleIndex-1]
         
         curopen = self.df.OPEN[candleIndex]
@@ -125,9 +127,9 @@ class HaramiBreakoutIndicator(Indicator):
                     harami = True
         
         if harami:
-            if prevclose > prevopen and curclose > curopen and curclose > prevclose:
+            if prevclose > prevopen and curclose > curopen and curclose > prevhigh:
                 return 'BUY'
-            elif prevclose < prevopen and curclose < curopen and curclose < prevclose:
+            elif prevclose < prevopen and curclose < curopen and curclose < prevlow:
                 return 'SELL'
 
         return ''
