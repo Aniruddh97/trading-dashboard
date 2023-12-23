@@ -2,6 +2,8 @@ from utils import *
 from .snr_indicator import *
 from .trendline_indicator import *
 from .cds_pattern_indicator import *
+from .eveningstar_indicator import *
+from .morningstar_indicator import *
 from .experimental_indicator import *
 from .ma_crossover_indicator import *
 from .moving_average_indicator import *
@@ -22,6 +24,12 @@ def getIndicators(data, ticker='', pattern=''):
     
     if 'HaramiBreakout' in indicatorSetting:
         indicators.append(HaramiBreakoutIndicator(data=data, tickerName=ticker, patternTitle=pattern))
+    
+    if 'MorningStar' in indicatorSetting:
+        indicators.append(MorningStarIndicator(data=data, tickerName=ticker, patternTitle=pattern))
+    
+    if 'EveningStar' in indicatorSetting:
+        indicators.append(EveningStarIndicator(data=data, tickerName=ticker, patternTitle=pattern))
     
     if 'Experimental' in indicatorSetting:
         indicators.append(ExperimentalIndicator(data=data, tickerName=ticker, patternTitle=pattern))

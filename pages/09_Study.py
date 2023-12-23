@@ -25,8 +25,12 @@ with st.form("Study form"):
         st.session_state['study_result'] = 0
         if 'study_order' in st.session_state:
             del st.session_state['study_order']
+            
+        if 'study_order_checkpoints' in st.session_state:
+            del st.session_state['study_order_checkpoints']
 
 container = st.container()
+checkpoints = st.container()
 if 'study_ticker' in st.session_state:
     df = st.session_state['study_ticker_data']
     candleIndex = st.slider('', min_value=df.index.start+getCandleCount(), max_value=df.index.stop-1)
@@ -35,6 +39,19 @@ if 'study_ticker' in st.session_state:
     fig = indicator.getIndicator(candleIndex)
 
     new_order = indicator.getOrder(candleIndex=candleIndex)
+
+    if 'study_order_checkpoints' not in st.session_state:
+        order_checkpoints = []
+        
+        i = df.index.start+getCandleCount()
+        while i <= df.index.stop-1:
+            c_order = indicator.getOrder(candleIndex=i)
+            if c_order['valid']:
+                order_checkpoints.append(i)
+            i += 1
+
+        st.session_state['study_order_checkpoints'] = order_checkpoints
+    checkpoints.write(f"Order Checkpoints : {st.session_state['study_order_checkpoints']}")
 
     col1, col2 = st.columns(2)
     col2.write(new_order)

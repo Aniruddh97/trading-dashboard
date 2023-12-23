@@ -5109,13 +5109,11 @@
         "candle_count": 70,
         "chart_height": 550,
         "ema_window": 50,
-        "indicator": [
-            "HaramiBreakout"
-        ],
+        "indicator": [],
         "pattern_filter": [],
         "pattern_recognition": true,
         "pivot_window": 21,
-        "slider": false,
+        "slider": true,
         "sort_by": "Signal",
         "wide_layout": true
     },

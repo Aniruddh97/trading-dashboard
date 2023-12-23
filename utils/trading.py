@@ -45,6 +45,11 @@ def get_trade_result(data, position, candleIndex, stop_loss, target, strike_pric
 
     return result
 
+
+def normalize_result(cost_price, result): 
+    return round(((result*100)/cost_price), 2)
+
+
 def process_open_trades():
     open_position_df = execute_query(ORDER_DATABASE_PATH, query="SELECT * FROM orders WHERE result IS NULL")
     if open_position_df is None or open_position_df.empty:

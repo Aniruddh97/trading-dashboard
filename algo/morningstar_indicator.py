@@ -12,7 +12,7 @@ from .candlestick_patterns import getCandlestickPatterns
 from utils import getCandleCount, getChartHeight, getFilterBySetting
 
 
-class ExperimentalIndicator(Indicator):
+class MorningStarIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)

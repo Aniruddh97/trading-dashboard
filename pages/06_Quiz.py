@@ -28,7 +28,7 @@ col2.metric(
 )
 
 meta = readJSON(METADATA_FILE_PATH)
-tickers = meta['LIST']['NIFTY 500']
+tickers = meta['LIST']['NIFTY 200']
 
 if 'ticker' not in st.session_state['quiz']:
 	try:

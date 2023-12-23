@@ -12,7 +12,7 @@ from .candlestick_patterns import getCandlestickPatterns
 from utils import getCandleCount, getChartHeight, getFilterBySetting
 
 
-class ExperimentalIndicator(Indicator):
+class EveningStarIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
@@ -98,11 +98,11 @@ class ExperimentalIndicator(Indicator):
     
 
     def getSignal(self, candleIndex):
-        # bullish ( start of reversal )
+        # bearish ( start of reversal )
         curopen = self.df.OPEN[candleIndex]
         curclose = self.df.CLOSE[candleIndex]
         
-        # bearish
+        # bullish
         pprevopen = self.df.OPEN[candleIndex-2]
         pprevclose = self.df.CLOSE[candleIndex-2]
         
@@ -114,18 +114,18 @@ class ExperimentalIndicator(Indicator):
     
         # print((abs(prevopen-prevclose)*100)/prevclose)
 
-        if curclose < prevhigh:
+        if curclose > prevlow:
             return ''
-        elif pprevopen < pprevclose or curopen > curclose:
+        elif pprevopen > pprevclose or curopen < curclose:
             return ''
         elif self.df.VOLUME[candleIndex] < self.df.VOLUME[candleIndex-1]:
             return ''
         elif (abs(prevopen-prevclose)*100)/prevclose > 0.5:
             return '' 
-        elif prevopen > min(self.df.CLOSE[candleIndex-6:candleIndex-1]) or prevlow > min(self.df.LOW[candleIndex-6:candleIndex-1]):
+        elif prevopen < max(self.df.CLOSE[candleIndex-6:candleIndex-1]) or prevhigh < max(self.df.HIGH[candleIndex-6:candleIndex-1]):
             return ''
         
-        return 'BUY'
+        return 'SELL'
 
 
     def getOrder(self, candleIndex):

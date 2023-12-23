@@ -33,14 +33,14 @@ def backtest(ind, onlyResult = True):
                 )
 
             curr_position = 'LONG' if curr_order['target'] > curr_order['strike_price'] else 'SHORT'
-            result = get_trade_result(
+            result = normalize_result(curr_order['strike_price'], get_trade_result(
                 df, 
                 curr_position,
                 candleIndex, 
                 curr_order['stop_loss'], 
                 curr_order['target'], 
                 curr_order['strike_price']
-            )
+            ))
 
             if result != 0:
                 curr_order = {}
