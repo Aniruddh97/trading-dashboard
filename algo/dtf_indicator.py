@@ -13,13 +13,13 @@ from .candlestick_patterns import getCandlestickPatterns
 from utils import getCandleCount, getChartHeight, getFilterBySetting
 
 
-class ExperimentalIndicator(Indicator):
+class DTFIndicator(Indicator):
 
     def __init__(self, data, tickerName='', patternTitle=''):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
         self.patterns = getFilterBySetting()
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
-        hdf = yf.download(f"{tickerName}.NS", interval='1h', period='730d', progress=False)
+        hdf = yf.download(f"{tickerName}.NS", interval='1h', period='2mo', progress=False)
         hdf.rename(columns={'Open': 'OPEN', 'High': 'HIGH','Low': 'LOW', 'Close': 'CLOSE', 'Volume': 'VOLUME'}, inplace=True)
         
         self.dosc = ta.stoch(high=data.HIGH, low=data.LOW, close=data.CLOSE, k=21, d=5)

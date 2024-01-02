@@ -34,7 +34,7 @@ with st.form('Configure settings'):
     patterns = getFilterBySetting()
     patternFilter = st.multiselect('Pattern Filter', options=candle_rankings.keys(), default=patterns)
     
-    indArray = ['EMA', 'S&R', 'MACrossover', 'HaramiBreakout', 'EveningStar', 'MorningStar', 'Experimental', 'Trendline', 'CandlestickPattern']
+    indArray = ['EMA', 'S&R', 'MACrossover', 'HaramiBreakout', 'EveningStar', 'MorningStar', 'DTF', 'Experimental', 'Trendline', 'CandlestickPattern']
     inds = getIndicatorSetting()
     indicator = st.multiselect('Indicator', options=indArray, default=inds)
     

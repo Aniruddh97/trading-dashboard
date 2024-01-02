@@ -5106,15 +5106,17 @@
     },
     "last_sync_date": "2023-10-15",
     "settings": {
-        "candle_count": 70,
+        "candle_count": 240,
         "chart_height": 550,
         "ema_window": 50,
-        "indicator": [],
+        "indicator": [
+            "S&R"
+        ],
         "pattern_filter": [],
         "pattern_recognition": true,
         "pivot_window": 21,
-        "slider": true,
-        "sort_by": "Signal",
+        "slider": false,
+        "sort_by": "Proximity %",
         "wide_layout": true
     },
     "watchlist": []

@@ -17,6 +17,8 @@ class SupportResistanceIndicator(Indicator):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
         self.df["EMA"] = ta.ema(data.CLOSE, length=self.emaWindow)
+        self.df['RSI'] = ta.rsi(data.CLOSE, length=14)
+        self.proximity = None
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
@@ -109,6 +111,7 @@ class SupportResistanceIndicator(Indicator):
         high = self.df.HIGH[candleIndex]
         low = self.df.LOW[candleIndex]
         close = self.df.CLOSE[candleIndex]
+        rsi = self.df.RSI[candleIndex]
         
         supports = []
         resistances = []
@@ -120,17 +123,20 @@ class SupportResistanceIndicator(Indicator):
                 supports.append(level)
 
         proximityThreshold = 0.75
+        self.proximity = None
 
         if len(supports) > 0:
             closestSupport = max(supports)
             proximitySupport = (abs(low - closestSupport))*100/low
             if close > open and proximitySupport < proximityThreshold:
+                self.proximity = proximitySupport
                 return 'BUY'
         
         if len(resistances) > 0:
             closestResistance = min(resistances)
             proximityResistance = (abs(closestResistance - high))*100/closestResistance
             if open > close and proximityResistance < proximityThreshold:
+                self.proximity = proximityResistance
                 return 'SELL'
 
         return ''
@@ -145,7 +151,7 @@ class SupportResistanceIndicator(Indicator):
             "valid": False,
             "signal": "",
             "candleIndex": candleIndex,
-            "proximity": None,
+            "proximity": self.proximity,
             "stop_loss": None,
             "target": None,
             "strike_price": close
@@ -159,12 +165,10 @@ class SupportResistanceIndicator(Indicator):
             order["signal"] = 'BUY'
             order["stop_loss"] = low - atr
             order["target"] = round(close + 1.5*(abs(close - order["stop_loss"])), 2)
-            order["proximity"] = None
         elif signal == 'SELL':
             order["valid"] = True
             order["signal"] = 'SELL'
             order["stop_loss"] = high + atr
             order["target"] = round(close - 1.5*(abs(close - order["stop_loss"])), 2)
-            order["proximity"] = None
 
         return order

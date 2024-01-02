@@ -1,5 +1,6 @@
 from utils import *
 from .snr_indicator import *
+from .dtf_indicator import *
 from .trendline_indicator import *
 from .cds_pattern_indicator import *
 from .eveningstar_indicator import *
@@ -9,39 +10,29 @@ from .ma_crossover_indicator import *
 from .moving_average_indicator import *
 from .harami_breakout_indicator import *
 
+ind_dic = {
+    'S&R': SupportResistanceIndicator,
+    'EMA': MovingAverageIndicator,
+    'MACrossover': MACrossoverIndicator,
+    'HaramiBreakout': HaramiBreakoutIndicator,
+    'MorningStar': MorningStarIndicator,
+    'EveningStar': EveningStarIndicator,
+    'Experimental': ExperimentalIndicator,
+    'CandlestickPattern': CandlestickPatternIndicator,
+    'Trendline': TrendlineIndicator,
+    'DTF': DTFIndicator,
+}
+
 def getIndicators(data, ticker='', pattern=''):
+
     indicatorSetting = getIndicatorSetting()
     indicators = []
-
-    if 'S&R' in indicatorSetting:
-        indicators.append(SupportResistanceIndicator(data=data, tickerName=ticker, patternTitle=pattern))
     
-    if 'EMA' in indicatorSetting:
-        indicators.append(MovingAverageIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'MACrossover' in indicatorSetting:
-        indicators.append(MACrossoverIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'HaramiBreakout' in indicatorSetting:
-        indicators.append(HaramiBreakoutIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'MorningStar' in indicatorSetting:
-        indicators.append(MorningStarIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'EveningStar' in indicatorSetting:
-        indicators.append(EveningStarIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'Experimental' in indicatorSetting:
-        indicators.append(ExperimentalIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'Trendline' in indicatorSetting:
-        indicators.append(TrendlineIndicator(data=data, tickerName=ticker, patternTitle=pattern))
-    
-    if 'CandlestickPattern' in indicatorSetting:
-        indicators.append(CandlestickPatternIndicator(data=data, tickerName=ticker, patternTitle=pattern))
+    for ind in indicatorSetting:
+        indicators.append(ind_dic[ind](data=data, tickerName=ticker, patternTitle=pattern))
 
     # default
     if len(indicators) == 0:
-        indicators.append(SupportResistanceIndicator(data=data, tickerName=ticker, patternTitle=pattern))
+        indicators.append(ExperimentalIndicator(data=data, tickerName=ticker, patternTitle=pattern))
 
     return indicators

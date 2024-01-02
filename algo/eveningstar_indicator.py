@@ -18,6 +18,7 @@ class EveningStarIndicator(Indicator):
         Indicator.__init__(self, data=data, tickerName=tickerName, patternTitle=patternTitle)
         self.patterns = getFilterBySetting()
         self.df["ATR"] = talib.ATR(data.HIGH, data.LOW, data.CLOSE, timeperiod=self.window)
+        self.df['RSI'] = ta.rsi(data.CLOSE, length=14)
 
     def getLevels(self, candleIndex):
         dfSlice = self.df[0:candleIndex+1]
@@ -113,8 +114,11 @@ class EveningStarIndicator(Indicator):
         prevclose = self.df.CLOSE[candleIndex-1]
     
         # print((abs(prevopen-prevclose)*100)/prevclose)
+        rsi = self.df.RSI[candleIndex]
 
         if curclose > prevlow:
+            return ''
+        elif rsi < 70:
             return ''
         elif pprevopen > pprevclose or curopen < curclose:
             return ''
