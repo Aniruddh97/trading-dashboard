@@ -76,6 +76,10 @@ class SupportResistanceIndicator(Indicator):
         start = candleIndex-getCandleCount()
         if start < 0:
             start = 0
+        end = self.df.index.stop - 1
+        if candleIndex > end:
+            candleIndex = end
+        
         dfSlice = self.df[start:candleIndex+1]
 
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
