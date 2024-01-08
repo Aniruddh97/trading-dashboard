@@ -132,15 +132,15 @@ class SupportResistanceIndicator(Indicator):
         if len(supports) > 0:
             closestSupport = max(supports)
             proximitySupport = (abs(low - closestSupport))*100/low
+            self.proximity = proximitySupport
             if close > open and proximitySupport < proximityThreshold:
-                self.proximity = proximitySupport
                 return 'BUY'
         
         if len(resistances) > 0:
             closestResistance = min(resistances)
             proximityResistance = (abs(closestResistance - high))*100/closestResistance
+            self.proximity = proximityResistance
             if open > close and proximityResistance < proximityThreshold:
-                self.proximity = proximityResistance
                 return 'SELL'
 
         return ''
