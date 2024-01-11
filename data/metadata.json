@@ -5108,7 +5108,7 @@
     "settings": {
         "candle_count": 240,
         "chart_height": 550,
-        "ema_window": 50,
+        "ema_window": 200,
         "indicator": [
             "S&R"
         ],

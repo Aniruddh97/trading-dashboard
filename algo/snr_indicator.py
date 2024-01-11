@@ -116,6 +116,7 @@ class SupportResistanceIndicator(Indicator):
         low = self.df.LOW[candleIndex]
         close = self.df.CLOSE[candleIndex]
         rsi = self.df.RSI[candleIndex]
+        atr = self.df.ATR[candleIndex]
         
         supports = []
         resistances = []
@@ -126,19 +127,19 @@ class SupportResistanceIndicator(Indicator):
             elif level < low:
                 supports.append(level)
 
-        proximityThreshold = 0.75
+        proximityThreshold = 0.1
         self.proximity = None
 
         if len(supports) > 0:
             closestSupport = max(supports)
-            proximitySupport = (abs(low - closestSupport))*100/low
+            proximitySupport = (abs(low - closestSupport))/atr
             self.proximity = proximitySupport
             if close > open and proximitySupport < proximityThreshold:
                 return 'BUY'
         
         if len(resistances) > 0:
             closestResistance = min(resistances)
-            proximityResistance = (abs(closestResistance - high))*100/closestResistance
+            proximityResistance = (abs(closestResistance - high))/atr
             self.proximity = proximityResistance
             if open > close and proximityResistance < proximityThreshold:
                 return 'SELL'
