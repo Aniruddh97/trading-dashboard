@@ -2,9 +2,9 @@ import math
 import pandas as pd
 import streamlit as st
 
-from algo import *
 from .util import *
 from .paginate import *
+from algo import getIndicators
 
 def evaluate_trade(data, date, strike_price, target, stop_loss):
     end = data.index.stop - 1
