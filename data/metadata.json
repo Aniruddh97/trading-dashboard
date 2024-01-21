@@ -5106,7 +5106,7 @@
     },
     "last_sync_date": "2023-10-15",
     "settings": {
-        "candle_count": 240,
+        "candle_count": 500,
         "chart_height": 550,
         "ema_window": 50,
         "indicator": [

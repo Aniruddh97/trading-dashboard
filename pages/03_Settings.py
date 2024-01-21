@@ -29,7 +29,7 @@ with st.form('Configure settings'):
     ema_window = st.number_input("EMA Window", value=emaWindow, min_value=5, max_value=200)
     
     candles = getCandleCount()
-    candle_count = st.number_input("Candle Count", value=candles, min_value=50, max_value=240)
+    candle_count = st.number_input("Candle Count", value=candles, min_value=50, max_value=500)
     
     patterns = getFilterBySetting()
     patternFilter = st.multiselect('Pattern Filter', options=candle_rankings.keys(), default=patterns)
