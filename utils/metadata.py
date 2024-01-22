@@ -29,6 +29,7 @@ def addToWatchlist(ticker, file_path=METADATA_FILE_PATH):
 	writeJSON(meta)
 	st.session_state['watchlist'] = []
 	st.toast(f'Added `{ticker}` to watchlist')
+	st.experimental_rerun()
 
 
 def removeFromWatchlist(ticker, file_path=METADATA_FILE_PATH):
