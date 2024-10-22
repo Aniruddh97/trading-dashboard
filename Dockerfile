@@ -17,6 +17,6 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["streamlit", "run", "main.py"]
+CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
 
-EXPOSE 8501
+EXPOSE 8080
